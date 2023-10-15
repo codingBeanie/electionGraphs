@@ -4,7 +4,7 @@ Create a nice one-page portfolio of the most relevant graphs for a democratic el
 # Goals
 ## Data Management
 * <span style="color: #d9ab23;">in progress</span> import CSV-file with voting results (as absolute numbers) for multiple years
-* <span style="color: #d8433c;">not started</span> calculating the relative voting numbers
+* <span style="color: red;">not started</span> calculating the relative voting numbers
 * <span style="color: #d8433c;">not started</span> compare the percentage difference to last year votings
 * <span style="color: #d8433c;">not started</span> calculating a seat distribution for a parliament according to the relative results
 * <span style="color: #d8433c;">not started</span> take into account a 5%-restriction for minimum vote count 
