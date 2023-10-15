@@ -3,16 +3,17 @@ Create a nice one-page portfolio of the most relevant graphs for a democratic el
 
 # Goals
 ## Data Management
-* <span style="color: #d9ab23;">in progress</span> import CSV-file with voting results (as absolute numbers) for multiple years
-* <span style="color: red;">not started</span> calculating the relative voting numbers
-* <span style="color: #d8433c;">not started</span> compare the percentage difference to last year votings
-* <span style="color: #d8433c;">not started</span> calculating a seat distribution for a parliament according to the relative results
-* <span style="color: #d8433c;">not started</span> take into account a 5%-restriction for minimum vote count 
-* <span style="color: #d8433c;">not started</span> calculate possible coalitions 
+*  `in progress` import CSV-file with voting results (as absolute numbers) for multiple years
+*  calculating the relative voting numbers
+*  compare the percentage difference to last year votings
+*  calculating a seat distribution for a parliament according to the relative results
+*  take into account a 5%-restriction for minimum vote count 
+*  calculate possible coalitions 
+A very <span style='color: red;'>long</span> sentence.
 
 ## Data Visualization
-* <span style="color: #d8433c;">not started</span> create a bar graph with results
-* <span style="color: #d8433c;">not started</span> create a bar graph with results compared to last year
-* <span style="color: #d8433c;">not started</span> create a bar graph with seat distribution in parliament
-* <span style="color: #d8433c;">not started</span> create a visulisation for possible coalitions
-* <span style="color: #d8433c;">not started</span> create a pdf/png with all graphs combined
+* create a bar graph with results
+* create a bar graph with results compared to last year
+* create a bar graph with seat distribution in parliament
+* create a visulisation for possible coalitions
+* create a pdf/png with all graphs combined
