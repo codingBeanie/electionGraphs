@@ -6,7 +6,7 @@ from itertools import combinations
 
 
 class VotingData:
-    def __init__(self, csvFile,  columnYear, columnVotings, columnParty, parliamentSeats, seperator=";", percentageLimit=5):
+    def __init__(self, csvFile,  columnYear, columnVotings, columnParty, columnSpectrum, parliamentSeats, seperator=";", percentageLimit=5):
 
         # read the csv and create the base dataFrame
         self.dataFrame = pd.read_csv(csvFile, sep=seperator)
@@ -18,6 +18,7 @@ class VotingData:
         self.parliamentSeats = parliamentSeats
         self.columnYear = columnYear
         self.columnParty = columnParty
+        self.columnSpectrum = columnSpectrum
 
         yearsInDataFrame = sorted(
             self.dataFrame[self.columnYear].unique())
@@ -79,18 +80,48 @@ class VotingData:
                         ] = None
 
     def getCoalitions(self, year):
-        dataCoalitions = self.dataFrame.loc[(
+        dataParties = self.dataFrame.loc[(
             self.dataFrame[self.columnYear] == year) & (self.dataFrame["SEATS"] > 0)]
 
-        arraySeats = dataCoalitions["SEATS"].to_list()
-        arrayParties = dataCoalitions[self.columnParty].to_list()
+        arrayParties = dataParties[self.columnParty].to_list()
 
-        print(arrayParties, arraySeats)
-        majoritySeats = self.parliamentSeats / 2 + 1
+        # get all possible combinations of coalitions
+        # create an empty dataframe
+        dataCoalitions = pd.DataFrame(
+            columns=["PARTIES", "SEATS", "MAJORITY", "POLITCAL_DISTANCE"])
+
+        # iterate through all possible combinations
+        for i in range(2, len(arrayParties) + 1):
+            for combination in list(combinations(arrayParties, i)):
+
+                # calculate the number of seats for each coalition
+                coalitionSeats = 0
+                politcalOrientation = []
+                for party in combination:
+                    coalitionSeats += self.dataFrame.loc[(self.dataFrame[self.columnYear] == year) & (
+                        self.dataFrame[self.columnParty] == party), "SEATS"].values[0]
+                    politcalOrientation.append(self.dataFrame.loc[(self.dataFrame[self.columnYear] == year) & (
+                        self.dataFrame[self.columnParty] == party), self.columnSpectrum].values[0])
+
+                print(politcalOrientation)
+                for i in range(len(politcalOrientation) - 1):
+                    for j in range(i, len(politcalOrientation)):
+
+                        print("i: ", i, "j: ", j, politcalOrientation[j])
+                # check if the coalition has the majority
+                if coalitionSeats >= self.parliamentSeats / 2:
+                    majority = True
+                else:
+                    majority = False
+
+                # add the coalition to the dataFrame
+                dataCoalitions = dataCoalitions._append(
+                    {"PARTIES": combination, "SEATS": coalitionSeats, "MAJORITY": majority, "POLITCAL_DISTANCE": politcalOrientation}, ignore_index=True)
+
         return dataCoalitions
 
 
 votingData = VotingData("data/exampleData.csv", "YEAR",
-                        "VOTINGS", "PARTY_SHORT", 120)
+                        "VOTINGS", "PARTY_SHORT", "PARTY_SPEC", 120)
 # print(votingData.dataFrame)
 print(votingData.getCoalitions(2017))
