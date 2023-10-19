@@ -79,7 +79,7 @@ class VotingData:
                             "VOTINGS_RELATIVE_DIFF",
                         ] = None
 
-    def getCoalitions(self, year):
+    def getCoalitions(self, year, thresholdPolitcalDistance=300):
         dataParties = self.dataFrame.loc[(
             self.dataFrame[self.columnYear] == year) & (self.dataFrame["SEATS"] > 0)]
 
@@ -103,11 +103,15 @@ class VotingData:
                     politcalOrientation.append(self.dataFrame.loc[(self.dataFrame[self.columnYear] == year) & (
                         self.dataFrame[self.columnParty] == party), self.columnSpectrum].values[0])
 
-                print(politcalOrientation)
+                # calculate the politcal distance between the parties
+                politcalDistance = []
                 for i in range(len(politcalOrientation) - 1):
-                    for j in range(i, len(politcalOrientation)):
-
-                        print("i: ", i, "j: ", j, politcalOrientation[j])
+                    baseValue = politcalOrientation[i]
+                    for j in range(i + 1, len(politcalOrientation)):
+                        politcalDistance.append(
+                            abs(baseValue - politcalOrientation[j]))
+                politcalDistance = int(sum(
+                    politcalDistance))
                 # check if the coalition has the majority
                 if coalitionSeats >= self.parliamentSeats / 2:
                     majority = True
@@ -116,7 +120,17 @@ class VotingData:
 
                 # add the coalition to the dataFrame
                 dataCoalitions = dataCoalitions._append(
-                    {"PARTIES": combination, "SEATS": coalitionSeats, "MAJORITY": majority, "POLITCAL_DISTANCE": politcalOrientation}, ignore_index=True)
+                    {"PARTIES": combination, "SEATS": coalitionSeats, "MAJORITY": majority, "POLITCAL_DISTANCE": politcalDistance}, ignore_index=True)
+                # filter the dataFrame by majority and threshold of politcal distance
+
+                dataCoalitions = dataCoalitions.loc[(dataCoalitions["MAJORITY"] == True) & (
+                    dataCoalitions["POLITCAL_DISTANCE"] <= thresholdPolitcalDistance)]
+
+                # !!!!!!! filter possible coalitions for which are bettter colations with less parties
+
+                # sort the dataFrame by politcal distance
+                dataCoalitions = dataCoalitions.sort_values(
+                    by=["POLITCAL_DISTANCE"], ascending=True)
 
         return dataCoalitions
 
@@ -124,4 +138,4 @@ class VotingData:
 votingData = VotingData("data/exampleData.csv", "YEAR",
                         "VOTINGS", "PARTY_SHORT", "PARTY_SPEC", 120)
 # print(votingData.dataFrame)
-print(votingData.getCoalitions(2017))
+votingData.getCoalitions(2017)
