@@ -1,13 +1,13 @@
 ﻿YEAR;PARTY_SHORT;PARTY_LONG;PARTY_COLOR;PARTY_SPEC;VOTINGS
-2021;SPD;Sozialdemokratische Partei Deutschlands;#ff0000;-50;781567
-2021;CDU;Christlich Demokratische Union Deutschlands;#000000;50;654230
+2021;SPD;Sozialdemokratische Partei Deutschlands;#ff0000;-100;781567
+2021;CDU;Christlich Demokratische Union Deutschlands;#000000;100;654230
 2021;FDP;Freie Demokratische Partei;#ffff00;0;112530
 2021;LINKE;DIE LINKE;#ff00ff;-200;119567
-2021;AFD;Alternative für Deutschland;#00b0f0;200;230504
-2021;GRÜNE;BÜNDNIS 90/DIE GRÜNEN;#70ad47;-100;504697
-2017;SPD;Sozialdemokratische Partei Deutschlands;#ff0000;-50;521508
-2017;CDU;Christlich Demokratische Union Deutschlands;#000000;50;765989
+2021;AFD;Alternative für Deutschland;#00b0f0;250;230504
+2021;GRÜNE;BÜNDNIS 90/DIE GRÜNEN;#70ad47;-150;504697
+2017;SPD;Sozialdemokratische Partei Deutschlands;#ff0000;-100;521508
+2017;CDU;Christlich Demokratische Union Deutschlands;#000000;100;765989
 2017;FDP;Freie Demokratische Partei;#ffff00;0;198546
 2017;LINKE;DIE LINKE;#ff00ff;-200;98564
-2017;AFD;Alternative für Deutschland;#00b0f0;200;185460
-2017;GRÜNE;BÜNDNIS 90/DIE GRÜNEN;#70ad47;-100;330590
+2017;AFD;Alternative für Deutschland;#00b0f0;250;185460
+2017;GRÜNE;BÜNDNIS 90/DIE GRÜNEN;#70ad47;-150;330590

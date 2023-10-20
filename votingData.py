@@ -3,10 +3,12 @@
 ###########################################################
 import pandas as pd
 from itertools import combinations
+import plotly.express as plotly
+from plotly.io import to_image
 
 
 class VotingData:
-    def __init__(self, csvFile,  columnYear, columnVotings, columnParty, columnSpectrum, parliamentSeats, seperator=";", percentageLimit=5):
+    def __init__(self, csvFile,  columnYear, columnVotings, columnParty, columnSpectrum, columnColor, parliamentSeats, seperator=";", percentageLimit=5):
 
         # read the csv and create the base dataFrame
         self.dataFrame = pd.read_csv(csvFile, sep=seperator)
@@ -19,6 +21,7 @@ class VotingData:
         self.columnYear = columnYear
         self.columnParty = columnParty
         self.columnSpectrum = columnSpectrum
+        self.columnColor = columnColor
 
         yearsInDataFrame = sorted(
             self.dataFrame[self.columnYear].unique())
@@ -33,6 +36,9 @@ class VotingData:
                                             == year, columnVotings].sum()
             self.dataFrame.loc[self.dataFrame[self.columnYear] == year, "VOTINGS_RELATIVE"] = round(
                 self.dataFrame[columnVotings] / totalVotes * 100, 3
+            )
+            self.dataFrame.loc[self.dataFrame[self.columnYear] == year, "VOTINGS_RELATIVE_DISPLAY"] = round(
+                self.dataFrame[columnVotings] / totalVotes * 100, 1
             )
 
             # sum of all votes that are above 5%
@@ -79,7 +85,7 @@ class VotingData:
                             "VOTINGS_RELATIVE_DIFF",
                         ] = None
 
-    def getCoalitions(self, year, thresholdPolitcalDistance=300):
+    def getCoalitions(self, year, thresholdPolitcalDistance=300, deleteSubsets=True):
         dataParties = self.dataFrame.loc[(
             self.dataFrame[self.columnYear] == year) & (self.dataFrame["SEATS"] > 0)]
 
@@ -125,17 +131,70 @@ class VotingData:
 
                 dataCoalitions = dataCoalitions.loc[(dataCoalitions["MAJORITY"] == True) & (
                     dataCoalitions["POLITCAL_DISTANCE"] <= thresholdPolitcalDistance)]
+        # end for
+        if deleteSubsets:
+            # loop through dataframe and find coalitions that are a subset of other coalitions (which have less parties involved)
+            deleteRows = []
+            for i in range(len(dataCoalitions)):
+                for ii in range(i + 1, len(dataCoalitions)):
+                    if set(dataCoalitions.loc[i, "PARTIES"]).issubset(set(dataCoalitions.loc[ii, "PARTIES"])):
+                        if ii not in deleteRows:
+                            deleteRows.append(ii)
 
-                # !!!!!!! filter possible coalitions for which are bettter colations with less parties
+                    elif set(dataCoalitions.loc[ii, "PARTIES"]).issubset(set(dataCoalitions.loc[i, "PARTIES"])):
+                        if i not in deleteRows:
+                            deleteRows.append(i)
 
-                # sort the dataFrame by politcal distance
-                dataCoalitions = dataCoalitions.sort_values(
-                    by=["POLITCAL_DISTANCE"], ascending=True)
+            # delete indeces from dataframe that are a subset of other coalitions
+            dataCoalitions = dataCoalitions.drop(deleteRows)
 
+        # sort by politcal distance
+        dataCoalitions = dataCoalitions.sort_values(
+            by="POLITCAL_DISTANCE", ascending=True)
         return dataCoalitions
+
+    def getGraph(self, year, type, outputfile, title="VOTING"):
+        print(self.dataFrame)
+        if type == "BAR_RESULT":
+            self.dataFrame = self.dataFrame[self.dataFrame[self.columnYear] == year].sort_values(
+                by=["VOTINGS_RELATIVE"], ascending=False
+            )
+            # for displaying purposes
+            partyColors = self.dataFrame[self.columnColor].tolist()
+            titleText = title + " " + str(year)
+
+            # Creating the main bar graph
+            barResult = plotly.bar(
+                self.dataFrame,
+                x=self.columnParty,
+                y="VOTINGS_RELATIVE",
+                color=self.columnParty,
+                color_discrete_sequence=partyColors,
+                text="VOTINGS_RELATIVE_DISPLAY",
+            )
+
+            # configure layout and other visuals
+            barResult.update_layout(
+                title={"text": "<b>" + titleText +
+                       "</b>", "font": {"size": 31}},
+                showlegend=False,
+                margin={"t": 80, "b": 50, "l": 20, "r": 20},
+            )
+            barResult.update_xaxes(title="", tickfont=dict(size=18))
+            barResult.update_yaxes(title="", tickfont=dict(size=12))
+            barResult.update_traces(
+                textfont_size=16, textposition="outside")
+
+            # export as png
+            image_bytes = to_image(barResult, format="png")
+            with open(outputfile, "wb") as f:
+                f.write(image_bytes)
 
 
 votingData = VotingData("data/exampleData.csv", "YEAR",
-                        "VOTINGS", "PARTY_SHORT", "PARTY_SPEC", 120)
+                        "VOTINGS", "PARTY_SHORT", "PARTY_SPEC", "PARTY_COLOR", 120)
 # print(votingData.dataFrame)
-votingData.getCoalitions(2017)
+# print(votingData.getCoalitions(
+#    2021, thresholdPolitcalDistance=300, deleteSubsets=True))
+votingData.getGraph(2021, "BAR_RESULT",
+                    outputfile="output/barresult.png", title="Wahl")
