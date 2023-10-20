@@ -230,4 +230,4 @@ votingData = VotingData("data/exampleData.csv", "YEAR",
 # print(votingData.getCoalitions(
 #    2021, thresholdPolitcalDistance=300, deleteSubsets=True))
 votingData.getGraph(2017, "BAR_RESULT",
-                    outputfile="output/barresult.png", title="Wahl", subtitle="Anzahl der Stimmen in Prozent")
+                    outputfile="output/barResult.png", title="Wahl", subtitle="Anzahl der Stimmen in Prozent")
