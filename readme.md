@@ -1,6 +1,8 @@
 # Voting Graph Portfolio
 Create a nice one-page portfolio of the most relevant graphs for a democratic election (parliament elections). This tool is loosly based on german elections. Some rulesets may differ from the reality. This is just a hobby project for practicing data handling and data visualization.
 
+# Examples
+![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barresult.png "Example Chart")
 
 # Goals
 :white_check_mark: done / implemented 
@@ -18,7 +20,7 @@ Create a nice one-page portfolio of the most relevant graphs for a democratic el
 
 
 ## Data Visualization
-* :large_orange_diamond:  create a bar graph with results
+* :white_check_mark:  create a bar graph with results
 * :large_orange_diamond:  create a bar graph with results compared to last year
 * :large_orange_diamond:  create a bar graph with seat distribution in parliament
 * :large_orange_diamond:  create a visulisation for possible coalitions

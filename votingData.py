@@ -37,10 +37,6 @@ class VotingData:
             self.dataFrame.loc[self.dataFrame[self.columnYear] == year, "VOTINGS_RELATIVE"] = round(
                 self.dataFrame[columnVotings] / totalVotes * 100, 3
             )
-            self.dataFrame.loc[self.dataFrame[self.columnYear] == year, "VOTINGS_RELATIVE_DISPLAY"] = round(
-                self.dataFrame[columnVotings] / totalVotes * 100, 1
-            )
-
             # sum of all votes that are above 5%
             totalVotesAboveLimit = self.dataFrame.loc[
                 (self.dataFrame[self.columnYear] == year) & (
@@ -84,6 +80,10 @@ class VotingData:
                                 self.dataFrame[self.columnParty] == party),
                             "VOTINGS_RELATIVE_DIFF",
                         ] = None
+
+##############################################################################################################################
+##############################################################################################################################
+##############################################################################################################################
 
     def getCoalitions(self, year, thresholdPolitcalDistance=300, deleteSubsets=True):
         dataParties = self.dataFrame.loc[(
@@ -153,32 +153,65 @@ class VotingData:
             by="POLITCAL_DISTANCE", ascending=True)
         return dataCoalitions
 
-    def getGraph(self, year, type, outputfile, title="VOTING"):
-        print(self.dataFrame)
+##############################################################################################################################
+##############################################################################################################################
+##############################################################################################################################
+
+    def getGraph(self, year, type, outputfile, title="VOTING", subtitle=""):
+
+        # set up a dedicated dataframe for the graph
+        printData = self.dataFrame[self.dataFrame[self.columnYear] == year].sort_values(
+            by=["VOTINGS_RELATIVE"], ascending=False
+        )
+
+        # format the column votings_relative to 1 decimal place
+        printData["VOTINGS_RELATIVE"] = printData["VOTINGS_RELATIVE"].apply(
+            lambda x: round(x, 1))
+
+        # for a mostly uniform look, the yaxis range is set based on the maximum value
+        maxValue = printData["VOTINGS_RELATIVE"].max()
+        if maxValue > 80:
+            yRange = [0, 100]
+        elif maxValue > 60:
+            yRange = [0, 85]
+        elif maxValue > 40:
+            yRange = [0, 65]
+        elif maxValue > 20:
+            yRange = [0, 45]
+
         if type == "BAR_RESULT":
-            self.dataFrame = self.dataFrame[self.dataFrame[self.columnYear] == year].sort_values(
-                by=["VOTINGS_RELATIVE"], ascending=False
-            )
             # for displaying purposes
-            partyColors = self.dataFrame[self.columnColor].tolist()
+            partyColors = printData[self.columnColor].tolist()
             titleText = title + " " + str(year)
 
             # Creating the main bar graph
             barResult = plotly.bar(
-                self.dataFrame,
+                printData,
                 x=self.columnParty,
                 y="VOTINGS_RELATIVE",
                 color=self.columnParty,
                 color_discrete_sequence=partyColors,
-                text="VOTINGS_RELATIVE_DISPLAY",
+                text="VOTINGS_RELATIVE",
             )
 
             # configure layout and other visuals
             barResult.update_layout(
                 title={"text": "<b>" + titleText +
-                       "</b>", "font": {"size": 31}},
+                       "</b>", "font": {"size": 31}, "x": 0.06, "y": 0.97},
                 showlegend=False,
-                margin={"t": 80, "b": 50, "l": 20, "r": 20},
+                margin={"t": 70, "b": 0, "l": 0, "r": 20},
+                yaxis=dict(range=yRange),
+                annotations=[
+                    dict(
+                        x=0,
+                        y=1.08,
+                        xref="paper",
+                        yref="paper",
+                        text="<i>"+subtitle+"</i>",
+                        showarrow=False,
+                        font=dict(size=16)
+                    )
+                ],
             )
             barResult.update_xaxes(title="", tickfont=dict(size=18))
             barResult.update_yaxes(title="", tickfont=dict(size=12))
@@ -186,7 +219,7 @@ class VotingData:
                 textfont_size=16, textposition="outside")
 
             # export as png
-            image_bytes = to_image(barResult, format="png")
+            image_bytes = to_image(barResult, format="png", scale=3)
             with open(outputfile, "wb") as f:
                 f.write(image_bytes)
 
@@ -196,5 +229,5 @@ votingData = VotingData("data/exampleData.csv", "YEAR",
 # print(votingData.dataFrame)
 # print(votingData.getCoalitions(
 #    2021, thresholdPolitcalDistance=300, deleteSubsets=True))
-votingData.getGraph(2021, "BAR_RESULT",
-                    outputfile="output/barresult.png", title="Wahl")
+votingData.getGraph(2017, "BAR_RESULT",
+                    outputfile="output/barresult.png", title="Wahl", subtitle="Anzahl der Stimmen in Prozent")
