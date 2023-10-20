@@ -1,17 +1,17 @@
 # Voting Graph Portfolio
 Create a nice one-page portfolio of the most relevant graphs for a democratic election (parliament elections). This tool is loosly based on german elections. Some rulesets may differ from the reality. This is just a hobby project for practicing data handling and data visualization.
 
-# Examples
+## Examples
 ###  Bar Graph for Results
 ![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barResult.png "Example Chart")
 
-# Goals
+## Goals
 :white_check_mark: done / implemented 
 :large_orange_diamond: in developement / not ready
 :red_circle: open
 :no_entry: cancelled/dismissed
 
-## Data Processing
+### Data Processing
 * :white_check_mark:  import CSV-file with voting results (as absolute numbers) for multiple years
 * :white_check_mark:  calculating the relative voting numbers
 * :white_check_mark::  compare the percentage difference to last year votings
@@ -20,7 +20,7 @@ Create a nice one-page portfolio of the most relevant graphs for a democratic el
 * :white_check_mark:   calculate possible coalitions 
 
 
-## Data Visualization
+### Data Visualization
 * :white_check_mark:  create a bar graph with results
 * :large_orange_diamond:  create a bar graph with results compared to last year
 * :large_orange_diamond:  create a bar graph with seat distribution in parliament
