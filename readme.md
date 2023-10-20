@@ -27,6 +27,11 @@ Create a nice one-page portfolio of the most relevant graphs for a democratic el
 * :large_orange_diamond:  create a visulisation for possible coalitions
 * :red_circle: create a pdf/png with all graphs combined
 
+### Finish Touch
+* :red_circle: review code and optimize
+* :red_circle: create documentation
+* :red_circle: create and publish as package
+
 
 ## Dependencies
 * pandas
