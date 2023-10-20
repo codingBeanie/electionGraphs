@@ -1,9 +1,12 @@
 # Voting Graph Portfolio
-Create a nice one-page portfolio of the most relevant graphs for a democratic election (parliament elections). This tool is loosly based on german elections. Some rulesets may differ from the reality. This is just a hobby project for practicing data handling and data visualization.
+**The Voting Graph Portfolio** is a python class that allows to create different voting charts/graphs. This class takes a pandas dataframe as input and processes the data in order to display the graphs accordingly.
+This tool is loosly based on german elections. Some rulesets may differ from the reality. This is just a hobby project for practicing data processing and data visualization.
 
 ## Examples
 ###  Bar Graph for Results
 ![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barResult.png "Example Chart")
+### Bar Graph for comparison to previous votings
+![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barDifference.png "Example Chart")
 
 ## Goals
 :white_check_mark: done / implemented 
@@ -22,10 +25,13 @@ Create a nice one-page portfolio of the most relevant graphs for a democratic el
 
 ### Data Visualization
 * :white_check_mark:  create a bar graph with results
-* :large_orange_diamond:  create a bar graph with results compared to last year
+* :white_check_mark:  create a bar graph with results compared to last year
 * :large_orange_diamond:  create a bar graph with seat distribution in parliament
 * :large_orange_diamond:  create a visulisation for possible coalitions
 * :red_circle: create a pdf/png with all graphs combined
+
+### Extra Goals
+* :large_orange_diamond:  add styling options/method for customization
 
 ### Finish Touch
 * :red_circle: review code and optimize

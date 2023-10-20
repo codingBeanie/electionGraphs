@@ -14,7 +14,7 @@ class VotingData:
         self.dataFrame = pd.read_csv(csvFile, sep=seperator)
 
         ###########################################################
-        # Variables
+        # Input Variables
         ###########################################################
 
         self.parliamentSeats = parliamentSeats
@@ -22,6 +22,20 @@ class VotingData:
         self.columnParty = columnParty
         self.columnSpectrum = columnSpectrum
         self.columnColor = columnColor
+        self.percentageLimit = percentageLimit
+
+        ###########################################################
+        # Styling Variable
+        ##########################################################
+        self.colors = {"background": "#F2EAD3",
+                       "diagram": "#F5F5F5",
+                       "title": "#3F2305",
+                       "subtitle": "#3F2305",
+                       "yaxis": "#3F2305",
+                       "xaxis": "#3F2305",
+                       "grid": "#DFD7BF",
+                       "values": "#3F2305",
+                       "threshold": "#DFD7BF"}
 
         yearsInDataFrame = sorted(
             self.dataFrame[self.columnYear].unique())
@@ -82,7 +96,7 @@ class VotingData:
                         ] = None
 
 ##############################################################################################################################
-##############################################################################################################################
+##### getCoalitions #########################################################################################################
 ##############################################################################################################################
 
     def getCoalitions(self, year, thresholdPolitcalDistance=300, deleteSubsets=True):
@@ -154,7 +168,7 @@ class VotingData:
         return dataCoalitions
 
 ##############################################################################################################################
-##############################################################################################################################
+##### getGraph ##############################################################################################################
 ##############################################################################################################################
 
     def getGraph(self, year, type, outputfile, title="VOTING", subtitle=""):
@@ -167,6 +181,12 @@ class VotingData:
         # format the column votings_relative to 1 decimal place
         printData["VOTINGS_RELATIVE"] = printData["VOTINGS_RELATIVE"].apply(
             lambda x: round(x, 1))
+        printData["VOTINGS_RELATIVE_DIFF"] = printData["VOTINGS_RELATIVE_DIFF"].apply(
+            lambda x: round(x, 1))
+
+        # for displaying purposes
+        partyColors = printData[self.columnColor].tolist()
+        titleText = title + " " + str(year)
 
         # for a mostly uniform look, the yaxis range is set based on the maximum value
         maxValue = printData["VOTINGS_RELATIVE"].max()
@@ -179,11 +199,11 @@ class VotingData:
         elif maxValue > 20:
             yRange = [0, 45]
 
-        if type == "BAR_RESULT":
-            # for displaying purposes
-            partyColors = printData[self.columnColor].tolist()
-            titleText = title + " " + str(year)
+        ############################################################################################
+        # BAR_RESULT
+        ############################################################################################
 
+        if type == "BAR_RESULT":
             # Creating the main bar graph
             barResult = plotly.bar(
                 printData,
@@ -197,10 +217,13 @@ class VotingData:
             # configure layout and other visuals
             barResult.update_layout(
                 title={"text": "<b>" + titleText +
-                       "</b>", "font": {"size": 31}, "x": 0.06, "y": 0.97},
+                       "</b>", "font": {"size": 31, "color": self.colors["title"]},  "x": 0.06, "y": 0.97},
+                paper_bgcolor=self.colors["background"],
+                plot_bgcolor=self.colors["diagram"],
+
                 showlegend=False,
                 margin={"t": 70, "b": 0, "l": 0, "r": 20},
-                yaxis=dict(range=yRange),
+                yaxis=dict(range=yRange, gridcolor=self.colors["grid"]),
                 annotations=[
                     dict(
                         x=0,
@@ -209,25 +232,84 @@ class VotingData:
                         yref="paper",
                         text="<i>"+subtitle+"</i>",
                         showarrow=False,
-                        font=dict(size=16)
+                        font=dict(size=16, color=self.colors["subtitle"])
                     )
                 ],
             )
-            barResult.update_xaxes(title="", tickfont=dict(size=18))
-            barResult.update_yaxes(title="", tickfont=dict(size=12))
+            barResult.update_xaxes(title="", tickfont=dict(
+                size=18, color=self.colors["xaxis"]))
+            barResult.update_yaxes(title="", tickfont=dict(
+                size=10, color=self.colors["yaxis"]))
             barResult.update_traces(
-                textfont_size=16, textposition="outside")
+                textfont_size=16, textposition="outside",  textfont_color=self.colors["values"])
+
+            # add line for 5% threshold
+            barResult.add_hline(y=self.percentageLimit, line_width=3,
+                                line_color=self.colors["threshold"], layer="below")
 
             # export as png
             image_bytes = to_image(barResult, format="png", scale=3)
             with open(outputfile, "wb") as f:
                 f.write(image_bytes)
 
+        ############################################################################################
+        # BAR_DIFFERENCE
+        ############################################################################################
+        if type == "BAR_DIFFERENCE":
+
+            # Creating the main bar graph
+            barDifference = plotly.bar(
+                printData,
+                x=self.columnParty,
+                y="VOTINGS_RELATIVE_DIFF",
+                color=self.columnParty,
+                color_discrete_sequence=partyColors,
+                text="VOTINGS_RELATIVE_DIFF",
+            )
+
+            # configure layout and other visuals
+            barDifference.update_layout(
+                title={"text": "<b>" + titleText +
+                       "</b>", "font": {"size": 31, "color": self.colors["title"]}, "x": 0.07, "y": 0.97},
+                showlegend=False,
+                paper_bgcolor=self.colors["background"],
+                plot_bgcolor=self.colors["diagram"],
+                margin={"t": 70, "b": 0, "l": 0, "r": 20},
+                yaxis=dict(range=[round(printData["VOTINGS_RELATIVE_DIFF"].min(
+                ), 0) - 2, round(printData["VOTINGS_RELATIVE_DIFF"].max(), 0) + 2], gridcolor=self.colors["grid"]),
+                annotations=[
+                    dict(
+                        x=0,
+                        y=1.08,
+                        xref="paper",
+                        yref="paper",
+                        text="<i>"+subtitle+"</i>",
+                        showarrow=False,
+                        font=dict(size=16, color=self.colors["subtitle"])
+                    )
+                ],
+            )
+            barDifference.update_xaxes(title="", tickfont=dict(
+                size=18, color=self.colors["xaxis"]))
+            barDifference.update_yaxes(title="", tickfont=dict(
+                size=10, color=self.colors["yaxis"]))
+            barDifference.update_traces(
+                textfont_size=16, textposition="outside", textfont_color=self.colors["values"])
+
+            # export as png
+            image_bytes = to_image(barDifference, format="png", scale=3)
+            with open(outputfile, "wb") as f:
+                f.write(image_bytes)
+
+##############################################################################################################################
+##############################################################################################################################
+##############################################################################################################################
+
 
 votingData = VotingData("data/exampleData.csv", "YEAR",
                         "VOTINGS", "PARTY_SHORT", "PARTY_SPEC", "PARTY_COLOR", 120)
-# print(votingData.dataFrame)
-# print(votingData.getCoalitions(
-#    2021, thresholdPolitcalDistance=300, deleteSubsets=True))
-votingData.getGraph(2017, "BAR_RESULT",
-                    outputfile="output/barResult.png", title="Wahl", subtitle="Anzahl der Stimmen in Prozent")
+
+votingData.getGraph(2021, "BAR_RESULT",
+                    outputfile="output/barResult.png", title="Wahl", subtitle="Anteil der Wählerstimmen in Prozent")
+votingData.getGraph(2021, "BAR_DIFFERENCE",
+                    outputfile="output/barDifference.png", title="Wahl", subtitle="Prozenzpunkte im Vergleich zur letzten Wahl")
