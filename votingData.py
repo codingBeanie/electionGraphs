@@ -396,6 +396,6 @@ votingData = VotingData("data/exampleData.csv", "YEAR",
 votingData.getGraph(2021, "BAR_RESULT",
                     outputfile="output/barResult.png", title="Wahl 2021", subtitle="Anteil der Wählerstimmen in Prozent")
 votingData.getGraph(2021, "BAR_DIFFERENCE",
-                    outputfile="output/barDifference.png", title="Wahl 2021", subtitle="Prozenzpunkte im Vergleich zur letzten Wahl")
+                    outputfile="output/barDifference.png", title="Wahl 2021", subtitle="Prozentpunkte im Vergleich zur letzten Wahl")
 votingData.getGraph(2021, "PARLIAMENT",
                     outputfile="output/graphParliament.png", title="Wahl 2021", subtitle="Anzahl Sitze im Parlament")
