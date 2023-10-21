@@ -35,7 +35,7 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 * :red_circle: create a pdf/png with all graphs combined
 
 ### Extra Goals
-* :large_orange_diamond:  add styling options/method for customization
+* :white_check_mark:  add styling options/method for customization (color and font-sizes can be changed)
 
 ### Finish Touch
 * :red_circle: review code and optimize
