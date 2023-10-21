@@ -2,11 +2,9 @@
 **The Voting Graph Portfolio** is a python class that allows to create different voting charts/graphs. This class takes a pandas dataframe as input and processes the data in order to display the graphs accordingly.
 This tool is loosly based on german elections. Some rulesets may differ from the reality. This is just a hobby project for practicing data processing and data visualization.
 
-## Examples
-###  Bar Graph for Results
-![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barResult.png "Example Chart")
-### Bar Graph for comparison to previous votings
-![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barDifference.png "Example Chart")
+## Examples Graphs
+###  Bar Graph for Results, previosu votings, parliament seat distribution
+![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barResult.png "Example Chart")![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barDifference.png "Example Chart")![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/graphParliament.png "Example Chart")
 
 ## Goals
 :white_check_mark: done / implemented 
@@ -26,7 +24,7 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 ### Data Visualization
 * :white_check_mark:  create a bar graph with results
 * :white_check_mark:  create a bar graph with results compared to last year
-* :large_orange_diamond:  create a bar graph with seat distribution in parliament
+* :white_check_mark:  create a bar graph with seat distribution in parliament
 * :large_orange_diamond:  create a visulisation for possible coalitions
 * :red_circle: create a pdf/png with all graphs combined
 
@@ -43,3 +41,4 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 * pandas
 * plotly
 * kaleido
+* pillow

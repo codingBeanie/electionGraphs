@@ -4,11 +4,17 @@
 import pandas as pd
 from itertools import combinations
 import plotly.express as plotly
+import plotly.graph_objects as go
 from plotly.io import to_image
+from PIL import Image
 
+
+# REFACTOR
+# use dict() instead of "x":0.4,
+# check if update-layout is necessary
 
 class VotingData:
-    def __init__(self, csvFile,  columnYear, columnVotings, columnParty, columnSpectrum, columnColor, parliamentSeats, seperator=";", percentageLimit=5):
+    def __init__(self, csvFile,  columnYear, columnVotings, columnParty, columnSpectrum, columnColor, parliamentSeats, seperator=";", percentageLimit=5, scale=3):
 
         # read the csv and create the base dataFrame
         self.dataFrame = pd.read_csv(csvFile, sep=seperator)
@@ -23,6 +29,7 @@ class VotingData:
         self.columnSpectrum = columnSpectrum
         self.columnColor = columnColor
         self.percentageLimit = percentageLimit
+        self.scale = scale
 
         ###########################################################
         # Styling Variable
@@ -36,6 +43,12 @@ class VotingData:
                        "grid": "#DFD7BF",
                        "values": "#3F2305",
                        "threshold": "#DFD7BF"}
+
+        self.fontsize = {"title": 32,
+                         "subtitle": 16,
+                         "values": 16,
+                         "yaxis": 10,
+                         "xaxis": 18}
 
         yearsInDataFrame = sorted(
             self.dataFrame[self.columnYear].unique())
@@ -186,7 +199,6 @@ class VotingData:
 
         # for displaying purposes
         partyColors = printData[self.columnColor].tolist()
-        titleText = title + " " + str(year)
 
         # for a mostly uniform look, the yaxis range is set based on the maximum value
         maxValue = printData["VOTINGS_RELATIVE"].max()
@@ -216,8 +228,8 @@ class VotingData:
 
             # configure layout and other visuals
             barResult.update_layout(
-                title={"text": "<b>" + titleText +
-                       "</b>", "font": {"size": 31, "color": self.colors["title"]},  "x": 0.06, "y": 0.97},
+                title={"text": "<b>" + title +
+                       "</b>", "font": {"size": self.fontsize["title"], "color": self.colors["title"]},  "x": 0.06, "y": 0.97},
                 paper_bgcolor=self.colors["background"],
                 plot_bgcolor=self.colors["diagram"],
 
@@ -232,23 +244,24 @@ class VotingData:
                         yref="paper",
                         text="<i>"+subtitle+"</i>",
                         showarrow=False,
-                        font=dict(size=16, color=self.colors["subtitle"])
+                        font=dict(
+                            size=self.fontsize["subtitle"], color=self.colors["subtitle"])
                     )
                 ],
             )
             barResult.update_xaxes(title="", tickfont=dict(
-                size=18, color=self.colors["xaxis"]))
+                size=self.fontsize["xaxis"], color=self.colors["xaxis"]))
             barResult.update_yaxes(title="", tickfont=dict(
-                size=10, color=self.colors["yaxis"]))
+                size=self.fontsize["yaxis"], color=self.colors["yaxis"]))
             barResult.update_traces(
-                textfont_size=16, textposition="outside",  textfont_color=self.colors["values"])
+                textfont_size=self.fontsize["values"], textposition="outside",  textfont_color=self.colors["values"])
 
             # add line for 5% threshold
             barResult.add_hline(y=self.percentageLimit, line_width=3,
                                 line_color=self.colors["threshold"], layer="below")
 
             # export as png
-            image_bytes = to_image(barResult, format="png", scale=3)
+            image_bytes = to_image(barResult, format="png", scale=self.scale)
             with open(outputfile, "wb") as f:
                 f.write(image_bytes)
 
@@ -269,8 +282,8 @@ class VotingData:
 
             # configure layout and other visuals
             barDifference.update_layout(
-                title={"text": "<b>" + titleText +
-                       "</b>", "font": {"size": 31, "color": self.colors["title"]}, "x": 0.07, "y": 0.97},
+                title={"text": "<b>" + title +
+                       "</b>", "font": {"size": self.fontsize["title"], "color": self.colors["title"]}, "x": 0.07, "y": 0.97},
                 showlegend=False,
                 paper_bgcolor=self.colors["background"],
                 plot_bgcolor=self.colors["diagram"],
@@ -285,21 +298,92 @@ class VotingData:
                         yref="paper",
                         text="<i>"+subtitle+"</i>",
                         showarrow=False,
-                        font=dict(size=16, color=self.colors["subtitle"])
+                        font=dict(
+                            size=self.fontsize["subtitle"], color=self.colors["subtitle"])
                     )
                 ],
             )
             barDifference.update_xaxes(title="", tickfont=dict(
-                size=18, color=self.colors["xaxis"]))
+                size=self.fontsize["xaxis"], color=self.colors["xaxis"]))
             barDifference.update_yaxes(title="", tickfont=dict(
-                size=10, color=self.colors["yaxis"]))
+                size=self.fontsize["yaxis"], color=self.colors["yaxis"]))
             barDifference.update_traces(
-                textfont_size=16, textposition="outside", textfont_color=self.colors["values"])
+                textfont_size=self.fontsize["values"], textposition="outside", textfont_color=self.colors["values"])
 
             # export as png
-            image_bytes = to_image(barDifference, format="png", scale=3)
+            image_bytes = to_image(
+                barDifference, format="png", scale=self.scale)
             with open(outputfile, "wb") as f:
                 f.write(image_bytes)
+
+        ############################################################################################
+        # PARLIAMENT GRAPH
+        ############################################################################################
+        if type == "PARLIAMENT":
+
+            # filter the dataFrame by the threshold
+            printDataParliament = printData.loc[(
+                printData["VOTINGS_RELATIVE"] >= self.percentageLimit)]
+
+            # sort by politcal spectrum
+            printDataParliament = printDataParliament.sort_values(
+                by=[self.columnSpectrum], ascending=False)
+            # add dummy row for displaying half-circle
+            printDataParliament = printDataParliament._append(
+                {self.columnParty: "dummy", "SEATS": self.parliamentSeats, self.columnColor: self.colors["background"]}, ignore_index=True)
+
+            # create Graph
+            self.graphParliament = go.Figure(
+                data=[
+                    go.Pie(
+                        labels=printDataParliament[self.columnParty],
+                        values=printDataParliament["SEATS"],
+                        title=dict(
+                            text="<i>"+subtitle+"</i>",
+                            font=dict(size=self.fontsize["subtitle"], color=self.colors["subtitle"]), position="top left"
+                        ),
+                        text=printDataParliament[self.columnParty] +
+                        " (" + printDataParliament["SEATS"].astype(str) + ")",
+                        textinfo="text",
+                        marker_colors=printDataParliament[self.columnColor],
+                        textfont_size=self.fontsize["values"],
+                        # textfont=dict(color=self.colors["values"]),
+                        hole=0.3,
+                        sort=False,
+                        direction="clockwise",
+                        rotation=270,
+                        showlegend=False,
+
+                    )
+                ],
+            )
+            self.graphParliament.update_layout(
+                margin=dict(l=0, r=0, t=40, b=0),
+                paper_bgcolor=self.colors["background"],
+                font=dict(color=self.colors["values"]),
+                annotations=[
+                    dict(
+                        x=0.18,
+                        y=1.08,
+                        xref="paper",
+                        yref="paper",
+                        text="<b>"+title+"</b>",
+                        showarrow=False,
+                        font=dict(
+                            size=self.fontsize["title"], color=self.colors["title"])
+                    )],
+            )
+            # export as png
+            image_bytes = to_image(self.graphParliament,
+                                   format="png", scale=self.scale * 1.8)
+            with open(outputfile, "wb") as f:
+                f.write(image_bytes)
+                # get image width
+            with Image.open(outputfile) as img:
+                width, height = img.size
+                # crop image
+                img.crop((0.1 * width, 0, width * 0.9, height * 0.60)
+                         ).save(outputfile)
 
 ##############################################################################################################################
 ##############################################################################################################################
@@ -310,6 +394,8 @@ votingData = VotingData("data/exampleData.csv", "YEAR",
                         "VOTINGS", "PARTY_SHORT", "PARTY_SPEC", "PARTY_COLOR", 120)
 
 votingData.getGraph(2021, "BAR_RESULT",
-                    outputfile="output/barResult.png", title="Wahl", subtitle="Anteil der Wählerstimmen in Prozent")
+                    outputfile="output/barResult.png", title="Wahl 2021", subtitle="Anteil der Wählerstimmen in Prozent")
 votingData.getGraph(2021, "BAR_DIFFERENCE",
-                    outputfile="output/barDifference.png", title="Wahl", subtitle="Prozenzpunkte im Vergleich zur letzten Wahl")
+                    outputfile="output/barDifference.png", title="Wahl 2021", subtitle="Prozenzpunkte im Vergleich zur letzten Wahl")
+votingData.getGraph(2021, "PARLIAMENT",
+                    outputfile="output/graphParliament.png", title="Wahl 2021", subtitle="Anzahl Sitze im Parlament")
