@@ -3,8 +3,14 @@
 This tool is loosly based on german elections. Some rulesets may differ from the reality. This is just a hobby project for practicing data processing and data visualization.
 
 ## Examples Graphs
-###  Bar Graph for Results, previosu votings, parliament seat distribution
-![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barResult.png "Example Chart")![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barDifference.png "Example Chart")![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/graphParliament.png "Example Chart")
+###  Bar Graph for voting result (percentage)
+![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barResult.png "Example Chart")
+
+### Bar Graph with comparison to previous voting results
+![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barDifference.png "Example Chart")
+
+### Parliament Seat Distribution
+![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/graphParliament.png "Example Chart")
 
 ## Goals
 :white_check_mark: done / implemented 
