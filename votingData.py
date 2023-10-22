@@ -13,9 +13,21 @@ from PIL import Image
 # use dict() instead of "x":0.4,
 # check if update-layout is necessary
 
-class VotingData:
-    def __init__(self, csvFile,  columnYear, columnVotings, columnParty, columnSpectrum, columnColor, parliamentSeats, seperator=";", percentageLimit=5, scale=3):
 
+class VotingData:
+    def __init__(
+        self,
+        csvFile,
+        columnYear,
+        columnVotings,
+        columnParty,
+        columnSpectrum,
+        columnColor,
+        parliamentSeats,
+        seperator=";",
+        percentageLimit=5,
+        scale=3,
+    ):
         # read the csv and create the base dataFrame
         self.dataFrame = pd.read_csv(csvFile, sep=seperator)
 
@@ -34,24 +46,27 @@ class VotingData:
         ###########################################################
         # Styling Variable
         ##########################################################
-        self.colors = {"background": "#F2EAD3",
-                       "diagram": "#F5F5F5",
-                       "title": "#3F2305",
-                       "subtitle": "#3F2305",
-                       "yaxis": "#3F2305",
-                       "xaxis": "#3F2305",
-                       "grid": "#DFD7BF",
-                       "values": "#3F2305",
-                       "threshold": "#DFD7BF"}
+        self.colors = {
+            "background": "#F2EAD3",
+            "diagram": "#F5F5F5",
+            "title": "#3F2305",
+            "subtitle": "#3F2305",
+            "yaxis": "#3F2305",
+            "xaxis": "#3F2305",
+            "grid": "#DFD7BF",
+            "values": "#3F2305",
+            "threshold": "#DFD7BF",
+        }
 
-        self.fontsize = {"title": 32,
-                         "subtitle": 16,
-                         "values": 16,
-                         "yaxis": 10,
-                         "xaxis": 18}
+        self.fontsize = {
+            "title": 32,
+            "subtitle": 16,
+            "values": 16,
+            "yaxis": 10,
+            "xaxis": 18,
+        }
 
-        yearsInDataFrame = sorted(
-            self.dataFrame[self.columnYear].unique())
+        yearsInDataFrame = sorted(self.dataFrame[self.columnYear].unique())
 
         ###########################################################
         # data processing
@@ -59,33 +74,40 @@ class VotingData:
 
         # calculate the total and relative votes for each year in dataFrame
         for year in yearsInDataFrame:
-            totalVotes = self.dataFrame.loc[self.dataFrame[self.columnYear]
-                                            == year, columnVotings].sum()
-            self.dataFrame.loc[self.dataFrame[self.columnYear] == year, "VOTINGS_RELATIVE"] = round(
-                self.dataFrame[columnVotings] / totalVotes * 100, 3
-            )
+            totalVotes = self.dataFrame.loc[
+                self.dataFrame[self.columnYear] == year, columnVotings
+            ].sum()
+            self.dataFrame.loc[
+                self.dataFrame[self.columnYear] == year, "VOTINGS_RELATIVE"
+            ] = round(self.dataFrame[columnVotings] / totalVotes * 100, 3)
             # sum of all votes that are above 5%
             totalVotesAboveLimit = self.dataFrame.loc[
-                (self.dataFrame[self.columnYear] == year) & (
-                    self.dataFrame["VOTINGS_RELATIVE"] >= percentageLimit), columnVotings
+                (self.dataFrame[self.columnYear] == year)
+                & (self.dataFrame["VOTINGS_RELATIVE"] >= percentageLimit),
+                columnVotings,
             ].sum()
 
             # calculate the number of seats for each party which is above the percentage limit
             self.dataFrame.loc[
-                (self.dataFrame[self.columnYear] == year) & (
-                    self.dataFrame["VOTINGS_RELATIVE"] >= 5), ["SEATS"]
-            ] = round(parliamentSeats * self.dataFrame[columnVotings] / totalVotesAboveLimit)
+                (self.dataFrame[self.columnYear] == year)
+                & (self.dataFrame["VOTINGS_RELATIVE"] >= 5),
+                ["SEATS"],
+            ] = round(
+                parliamentSeats *
+                self.dataFrame[columnVotings] / totalVotesAboveLimit
+            )
             self.dataFrame["SEATS"] = self.dataFrame["SEATS"].fillna(0)
             self.dataFrame["SEATS"] = self.dataFrame["SEATS"].astype(int)
 
-        # Calculate the difference of REL to the previous year
+            # Calculate the difference of REL to the previous year
             for party in self.dataFrame[self.columnParty].unique():
                 for i, year in enumerate(yearsInDataFrame):
                     if i != 0:
                         # filter the dataFrame by year and party and calculate the difference
                         currentRel = self.dataFrame.loc[
-                            (self.dataFrame[self.columnYear] == year) & (
-                                self.dataFrame[self.columnParty] == party), "VOTINGS_RELATIVE"
+                            (self.dataFrame[self.columnYear] == year)
+                            & (self.dataFrame[self.columnParty] == party),
+                            "VOTINGS_RELATIVE",
                         ].values[0]
                         previousRel = self.dataFrame.loc[
                             (self.dataFrame[self.columnYear]
@@ -97,44 +119,54 @@ class VotingData:
 
                         # add the difference to the dataFrame
                         self.dataFrame.loc[
-                            (self.dataFrame[self.columnYear] == year) & (
-                                self.dataFrame[self.columnParty] == party),
+                            (self.dataFrame[self.columnYear] == year)
+                            & (self.dataFrame[self.columnParty] == party),
                             "VOTINGS_RELATIVE_DIFF",
                         ] = difference
                     else:
                         self.dataFrame.loc[
-                            (self.dataFrame[self.columnYear] == year) & (
-                                self.dataFrame[self.columnParty] == party),
+                            (self.dataFrame[self.columnYear] == year)
+                            & (self.dataFrame[self.columnParty] == party),
                             "VOTINGS_RELATIVE_DIFF",
                         ] = None
 
-##############################################################################################################################
-##### getCoalitions #########################################################################################################
-##############################################################################################################################
+    ##############################################################################################################################
+    ##### getCoalitions #########################################################################################################
+    ##############################################################################################################################
 
     def getCoalitions(self, year, thresholdPolitcalDistance=300, deleteSubsets=True):
-        dataParties = self.dataFrame.loc[(
-            self.dataFrame[self.columnYear] == year) & (self.dataFrame["SEATS"] > 0)]
+        dataParties = self.dataFrame.loc[
+            (self.dataFrame[self.columnYear] == year) & (
+                self.dataFrame["SEATS"] > 0)
+        ]
 
         arrayParties = dataParties[self.columnParty].to_list()
 
         # get all possible combinations of coalitions
         # create an empty dataframe
         dataCoalitions = pd.DataFrame(
-            columns=["PARTIES", "SEATS", "MAJORITY", "POLITCAL_DISTANCE"])
+            columns=["PARTIES", "SEATS", "MAJORITY", "POLITCAL_DISTANCE"]
+        )
 
         # iterate through all possible combinations
         for i in range(2, len(arrayParties) + 1):
             for combination in list(combinations(arrayParties, i)):
-
                 # calculate the number of seats for each coalition
                 coalitionSeats = 0
                 politcalOrientation = []
                 for party in combination:
-                    coalitionSeats += self.dataFrame.loc[(self.dataFrame[self.columnYear] == year) & (
-                        self.dataFrame[self.columnParty] == party), "SEATS"].values[0]
-                    politcalOrientation.append(self.dataFrame.loc[(self.dataFrame[self.columnYear] == year) & (
-                        self.dataFrame[self.columnParty] == party), self.columnSpectrum].values[0])
+                    coalitionSeats += self.dataFrame.loc[
+                        (self.dataFrame[self.columnYear] == year)
+                        & (self.dataFrame[self.columnParty] == party),
+                        "SEATS",
+                    ].values[0]
+                    politcalOrientation.append(
+                        self.dataFrame.loc[
+                            (self.dataFrame[self.columnYear] == year)
+                            & (self.dataFrame[self.columnParty] == party),
+                            self.columnSpectrum,
+                        ].values[0]
+                    )
 
                 # calculate the politcal distance between the parties
                 politcalDistance = []
@@ -143,32 +175,44 @@ class VotingData:
                     for j in range(i + 1, len(politcalOrientation)):
                         politcalDistance.append(
                             abs(baseValue - politcalOrientation[j]))
-                politcalDistance = int(sum(
-                    politcalDistance))
+                politcalDistance = int(sum(politcalDistance))
                 # check if the coalition has the majority
-                if coalitionSeats >= self.parliamentSeats / 2:
+                if coalitionSeats > self.parliamentSeats / 2:
                     majority = True
                 else:
                     majority = False
 
                 # add the coalition to the dataFrame
                 dataCoalitions = dataCoalitions._append(
-                    {"PARTIES": combination, "SEATS": coalitionSeats, "MAJORITY": majority, "POLITCAL_DISTANCE": politcalDistance}, ignore_index=True)
+                    {
+                        "PARTIES": combination,
+                        "SEATS": coalitionSeats,
+                        "MAJORITY": majority,
+                        "POLITCAL_DISTANCE": politcalDistance,
+                    },
+                    ignore_index=True,
+                )
                 # filter the dataFrame by majority and threshold of politcal distance
 
-                dataCoalitions = dataCoalitions.loc[(dataCoalitions["MAJORITY"] == True) & (
-                    dataCoalitions["POLITCAL_DISTANCE"] <= thresholdPolitcalDistance)]
+                dataCoalitions = dataCoalitions.loc[
+                    (dataCoalitions["MAJORITY"] == True)
+                    & (dataCoalitions["POLITCAL_DISTANCE"] <= thresholdPolitcalDistance)
+                ]
         # end for
         if deleteSubsets:
             # loop through dataframe and find coalitions that are a subset of other coalitions (which have less parties involved)
             deleteRows = []
             for i in range(len(dataCoalitions)):
                 for ii in range(i + 1, len(dataCoalitions)):
-                    if set(dataCoalitions.loc[i, "PARTIES"]).issubset(set(dataCoalitions.loc[ii, "PARTIES"])):
+                    if set(dataCoalitions.loc[i, "PARTIES"]).issubset(
+                        set(dataCoalitions.loc[ii, "PARTIES"])
+                    ):
                         if ii not in deleteRows:
                             deleteRows.append(ii)
 
-                    elif set(dataCoalitions.loc[ii, "PARTIES"]).issubset(set(dataCoalitions.loc[i, "PARTIES"])):
+                    elif set(dataCoalitions.loc[ii, "PARTIES"]).issubset(
+                        set(dataCoalitions.loc[i, "PARTIES"])
+                    ):
                         if i not in deleteRows:
                             deleteRows.append(i)
 
@@ -177,15 +221,15 @@ class VotingData:
 
         # sort by politcal distance
         dataCoalitions = dataCoalitions.sort_values(
-            by="POLITCAL_DISTANCE", ascending=True)
+            by="POLITCAL_DISTANCE", ascending=True
+        )
         return dataCoalitions
 
-##############################################################################################################################
-##### getGraph ##############################################################################################################
-##############################################################################################################################
+    ##############################################################################################################################
+    ##### getGraph ##############################################################################################################
+    ##############################################################################################################################
 
     def getGraph(self, year, type, outputfile, title="VOTING", subtitle=""):
-
         # set up a dedicated dataframe for the graph
         printData = self.dataFrame[self.dataFrame[self.columnYear] == year].sort_values(
             by=["VOTINGS_RELATIVE"], ascending=False
@@ -193,9 +237,11 @@ class VotingData:
 
         # format the column votings_relative to 1 decimal place
         printData["VOTINGS_RELATIVE"] = printData["VOTINGS_RELATIVE"].apply(
-            lambda x: round(x, 1))
+            lambda x: round(x, 1)
+        )
         printData["VOTINGS_RELATIVE_DIFF"] = printData["VOTINGS_RELATIVE_DIFF"].apply(
-            lambda x: round(x, 1))
+            lambda x: round(x, 1)
+        )
 
         # for displaying purposes
         partyColors = printData[self.columnColor].tolist()
@@ -228,11 +274,17 @@ class VotingData:
 
             # configure layout and other visuals
             barResult.update_layout(
-                title={"text": "<b>" + title +
-                       "</b>", "font": {"size": self.fontsize["title"], "color": self.colors["title"]},  "x": 0.06, "y": 0.97},
+                title={
+                    "text": "<b>" + title + "</b>",
+                    "font": {
+                        "size": self.fontsize["title"],
+                        "color": self.colors["title"],
+                    },
+                    "x": 0.06,
+                    "y": 0.97,
+                },
                 paper_bgcolor=self.colors["background"],
                 plot_bgcolor=self.colors["diagram"],
-
                 showlegend=False,
                 margin={"t": 70, "b": 0, "l": 0, "r": 20},
                 yaxis=dict(range=yRange, gridcolor=self.colors["grid"]),
@@ -242,23 +294,38 @@ class VotingData:
                         y=1.08,
                         xref="paper",
                         yref="paper",
-                        text="<i>"+subtitle+"</i>",
+                        text="<i>" + subtitle + "</i>",
                         showarrow=False,
                         font=dict(
-                            size=self.fontsize["subtitle"], color=self.colors["subtitle"])
+                            size=self.fontsize["subtitle"],
+                            color=self.colors["subtitle"],
+                        ),
                     )
                 ],
             )
-            barResult.update_xaxes(title="", tickfont=dict(
-                size=self.fontsize["xaxis"], color=self.colors["xaxis"]))
-            barResult.update_yaxes(title="", tickfont=dict(
-                size=self.fontsize["yaxis"], color=self.colors["yaxis"]))
+            barResult.update_xaxes(
+                title="",
+                tickfont=dict(
+                    size=self.fontsize["xaxis"], color=self.colors["xaxis"]),
+            )
+            barResult.update_yaxes(
+                title="",
+                tickfont=dict(
+                    size=self.fontsize["yaxis"], color=self.colors["yaxis"]),
+            )
             barResult.update_traces(
-                textfont_size=self.fontsize["values"], textposition="outside",  textfont_color=self.colors["values"])
+                textfont_size=self.fontsize["values"],
+                textposition="outside",
+                textfont_color=self.colors["values"],
+            )
 
             # add line for 5% threshold
-            barResult.add_hline(y=self.percentageLimit, line_width=3,
-                                line_color=self.colors["threshold"], layer="below")
+            barResult.add_hline(
+                y=self.percentageLimit,
+                line_width=3,
+                line_color=self.colors["threshold"],
+                layer="below",
+            )
 
             # export as png
             image_bytes = to_image(barResult, format="png", scale=self.scale)
@@ -269,7 +336,6 @@ class VotingData:
         # BAR_DIFFERENCE
         ############################################################################################
         if type == "BAR_DIFFERENCE":
-
             # Creating the main bar graph
             barDifference = plotly.bar(
                 printData,
@@ -282,33 +348,56 @@ class VotingData:
 
             # configure layout and other visuals
             barDifference.update_layout(
-                title={"text": "<b>" + title +
-                       "</b>", "font": {"size": self.fontsize["title"], "color": self.colors["title"]}, "x": 0.07, "y": 0.97},
+                title={
+                    "text": "<b>" + title + "</b>",
+                    "font": {
+                        "size": self.fontsize["title"],
+                        "color": self.colors["title"],
+                    },
+                    "x": 0.07,
+                    "y": 0.97,
+                },
                 showlegend=False,
                 paper_bgcolor=self.colors["background"],
                 plot_bgcolor=self.colors["diagram"],
                 margin={"t": 70, "b": 0, "l": 0, "r": 20},
-                yaxis=dict(range=[round(printData["VOTINGS_RELATIVE_DIFF"].min(
-                ), 0) - 2, round(printData["VOTINGS_RELATIVE_DIFF"].max(), 0) + 2], gridcolor=self.colors["grid"]),
+                yaxis=dict(
+                    range=[
+                        round(printData["VOTINGS_RELATIVE_DIFF"].min(), 0) - 2,
+                        round(printData["VOTINGS_RELATIVE_DIFF"].max(), 0) + 2,
+                    ],
+                    gridcolor=self.colors["grid"],
+                ),
                 annotations=[
                     dict(
                         x=0,
                         y=1.08,
                         xref="paper",
                         yref="paper",
-                        text="<i>"+subtitle+"</i>",
+                        text="<i>" + subtitle + "</i>",
                         showarrow=False,
                         font=dict(
-                            size=self.fontsize["subtitle"], color=self.colors["subtitle"])
+                            size=self.fontsize["subtitle"],
+                            color=self.colors["subtitle"],
+                        ),
                     )
                 ],
             )
-            barDifference.update_xaxes(title="", tickfont=dict(
-                size=self.fontsize["xaxis"], color=self.colors["xaxis"]))
-            barDifference.update_yaxes(title="", tickfont=dict(
-                size=self.fontsize["yaxis"], color=self.colors["yaxis"]))
+            barDifference.update_xaxes(
+                title="",
+                tickfont=dict(
+                    size=self.fontsize["xaxis"], color=self.colors["xaxis"]),
+            )
+            barDifference.update_yaxes(
+                title="",
+                tickfont=dict(
+                    size=self.fontsize["yaxis"], color=self.colors["yaxis"]),
+            )
             barDifference.update_traces(
-                textfont_size=self.fontsize["values"], textposition="outside", textfont_color=self.colors["values"])
+                textfont_size=self.fontsize["values"],
+                textposition="outside",
+                textfont_color=self.colors["values"],
+            )
 
             # export as png
             image_bytes = to_image(
@@ -320,30 +409,43 @@ class VotingData:
         # PARLIAMENT GRAPH
         ############################################################################################
         if type == "PARLIAMENT":
-
             # filter the dataFrame by the threshold
-            printDataParliament = printData.loc[(
-                printData["VOTINGS_RELATIVE"] >= self.percentageLimit)]
+            printDataParliament = printData.loc[
+                (printData["VOTINGS_RELATIVE"] >= self.percentageLimit)
+            ]
 
             # sort by politcal spectrum
             printDataParliament = printDataParliament.sort_values(
-                by=[self.columnSpectrum], ascending=False)
+                by=[self.columnSpectrum], ascending=False
+            )
             # add dummy row for displaying half-circle
             printDataParliament = printDataParliament._append(
-                {self.columnParty: "dummy", "SEATS": self.parliamentSeats, self.columnColor: self.colors["background"]}, ignore_index=True)
+                {
+                    self.columnParty: "dummy",
+                    "SEATS": self.parliamentSeats,
+                    self.columnColor: self.colors["background"],
+                },
+                ignore_index=True,
+            )
 
             # create Graph
-            self.graphParliament = go.Figure(
+            graphParliament = go.Figure(
                 data=[
                     go.Pie(
                         labels=printDataParliament[self.columnParty],
                         values=printDataParliament["SEATS"],
                         title=dict(
-                            text="<i>"+subtitle+"</i>",
-                            font=dict(size=self.fontsize["subtitle"], color=self.colors["subtitle"]), position="top left"
+                            text="<i>" + subtitle + "</i>",
+                            font=dict(
+                                size=self.fontsize["subtitle"],
+                                color=self.colors["subtitle"],
+                            ),
+                            position="top left",
                         ),
-                        text=printDataParliament[self.columnParty] +
-                        " (" + printDataParliament["SEATS"].astype(str) + ")",
+                        text=printDataParliament[self.columnParty]
+                        + " ("
+                        + printDataParliament["SEATS"].astype(str)
+                        + ")",
                         textinfo="text",
                         marker_colors=printDataParliament[self.columnColor],
                         textfont_size=self.fontsize["values"],
@@ -353,11 +455,10 @@ class VotingData:
                         direction="clockwise",
                         rotation=270,
                         showlegend=False,
-
                     )
                 ],
             )
-            self.graphParliament.update_layout(
+            graphParliament.update_layout(
                 margin=dict(l=0, r=0, t=40, b=0),
                 paper_bgcolor=self.colors["background"],
                 font=dict(color=self.colors["values"]),
@@ -367,35 +468,143 @@ class VotingData:
                         y=1.08,
                         xref="paper",
                         yref="paper",
-                        text="<b>"+title+"</b>",
+                        text="<b>" + title + "</b>",
                         showarrow=False,
                         font=dict(
-                            size=self.fontsize["title"], color=self.colors["title"])
-                    )],
+                            size=self.fontsize["title"], color=self.colors["title"]
+                        ),
+                    )
+                ],
             )
             # export as png
-            image_bytes = to_image(self.graphParliament,
-                                   format="png", scale=self.scale * 1.8)
+            image_bytes = to_image(
+                graphParliament, format="png", scale=self.scale * 1.8
+            )
             with open(outputfile, "wb") as f:
                 f.write(image_bytes)
                 # get image width
             with Image.open(outputfile) as img:
                 width, height = img.size
                 # crop image
-                img.crop((0.1 * width, 0, width * 0.9, height * 0.60)
-                         ).save(outputfile)
+                img.crop((0.1 * width, 0, width * 0.9,
+                         height * 0.60)).save(outputfile)
+
+        ##############################################################################################################################
+        #### coalitionsGraph #########################################################################################################
+        ##############################################################################################################################
+        if type == "COALITIONS":
+            printDataCoalitions = pd.DataFrame(
+                columns=["COALITION", "PARTY", "SEATS"])
+            coalitions = self.getCoalitions(year)
+            for i in range(len(coalitions)):
+                for p in coalitions.loc[i, "PARTIES"]:
+                    partySeats = self.dataFrame.loc[
+                        (self.dataFrame[self.columnYear] == year)
+                        & (self.dataFrame[self.columnParty] == p),
+                        "SEATS",
+                    ].values[0]
+                    printDataCoalitions = printDataCoalitions._append(
+                        dict(COALITION=i, PARTY=p, SEATS=partySeats), ignore_index=True
+                    )
+            #sort by coalition and then seats
+            printDataCoalitions = printDataCoalitions.sort_values(
+                by=["COALITION", "SEATS"], ascending=[True, False])
+            partyArray = printDataCoalitions["PARTY"].unique()
+            partyColorsCoalitions = []
+            for p in partyArray:
+                partyColorsCoalitions.append(
+                    self.dataFrame.loc[
+                        (self.dataFrame[self.columnYear] == year)
+                        & (self.dataFrame[self.columnParty] == p),
+                        self.columnColor,
+                    ].values[0]
+                )
+
+            # create Graph
+            coalitionsGraph = plotly.bar(
+                printDataCoalitions,
+                x="SEATS",
+                y="COALITION",
+                color="PARTY",
+                color_discrete_sequence=partyColorsCoalitions,
+                text="PARTY",
+                orientation="h",
+                barmode="stack",
+            )
+
+            coalitionsGraph.update_traces(
+                textposition="inside", insidetextanchor='middle', textfont_size=self.fontsize["values"])
+            coalitionsGraph.update_layout(
+                title=dict(
+                    text="<b>" + title + "</b>",
+                    font=dict(
+                        size=self.fontsize["title"], color=self.colors["title"]),
+                    x=0.03,
+                    y=0.98,
+                ),
+                annotations=[
+                    dict(
+                        x=0,
+                        y=1.08,
+                        xref="paper",
+                        yref="paper",
+                        text="<i>" + subtitle + "</i>",
+                        showarrow=False,
+                        font=dict(
+                            size=self.fontsize["subtitle"],
+                            color=self.colors["subtitle"],
+                        ),
+                    )
+                ],
+                bargap=0.5,
+                paper_bgcolor=self.colors["background"],
+                plot_bgcolor=self.colors["diagram"],
+                showlegend=False,
+                margin={"t": 70, "b": 0, "l": 0, "r": 20},
+                yaxis=dict(
+                    gridcolor=self.colors["diagram"], title="", showticklabels=False),
+                xaxis=dict(title="", gridcolor=self.colors["grid"]),
+            ),
+
+            # add line for majority
+            coalitionsGraph.add_vline(
+                x=self.parliamentSeats / 2,
+                line_width=5,
+                line_color=self.colors["threshold"],
+                layer="below",
+            )
+            # export as png
+            image_bytes = to_image(
+                coalitionsGraph, format="png", scale=self.scale)
+            with open(outputfile, "wb") as f:
+                f.write(image_bytes)
+
 
 ##############################################################################################################################
 ##############################################################################################################################
 ##############################################################################################################################
 
 
-votingData = VotingData("data/exampleData.csv", "YEAR",
-                        "VOTINGS", "PARTY_SHORT", "PARTY_SPEC", "PARTY_COLOR", 120)
+votingData = VotingData(
+    "data/exampleData.csv",
+    "YEAR",
+    "VOTINGS",
+    "PARTY_SHORT",
+    "PARTY_SPEC",
+    "PARTY_COLOR",
+    120,
+)
 
-votingData.getGraph(2021, "BAR_RESULT",
-                    outputfile="output/barResult.png", title="Wahl 2021", subtitle="Anteil der Wählerstimmen in Prozent")
-votingData.getGraph(2021, "BAR_DIFFERENCE",
-                    outputfile="output/barDifference.png", title="Wahl 2021", subtitle="Prozentpunkte im Vergleich zur letzten Wahl")
-votingData.getGraph(2021, "PARLIAMENT",
-                    outputfile="output/graphParliament.png", title="Wahl 2021", subtitle="Anzahl Sitze im Parlament")
+# votingData.getGraph(2021, "BAR_RESULT",
+#                    outputfile="output/barResult.png", title="Wahl 2021", subtitle="Anteil der Wählerstimmen in Prozent")
+# votingData.getGraph(2021, "BAR_DIFFERENCE",
+#                   outputfile="output/barDifference.png", title="Wahl 2021", subtitle="Prozentpunkte im Vergleich zur letzten Wahl")
+# votingData.getGraph(2021, "PARLIAMENT",
+#                   outputfile="output/graphParliament.png", title="Wahl 2021", subtitle="Anzahl Sitze im Parlament")
+votingData.getGraph(
+    2017,
+    "COALITIONS",
+    outputfile="output/graphCoalition.png",
+    title="Wahl 2017",
+    subtitle="Anzahl Sitze für mögliche Koalitionen",
+)
