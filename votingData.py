@@ -2,6 +2,7 @@
 # Class for processing voting data
 ###########################################################
 import pandas as pd
+import os
 from itertools import combinations
 import plotly.express as plotly
 import plotly.graph_objects as go
@@ -506,7 +507,7 @@ class VotingData:
                     printDataCoalitions = printDataCoalitions._append(
                         dict(COALITION=i, PARTY=p, SEATS=partySeats), ignore_index=True
                     )
-            #sort by coalition and then seats
+            # sort by coalition and then seats
             printDataCoalitions = printDataCoalitions.sort_values(
                 by=["COALITION", "SEATS"], ascending=[True, False])
             partyArray = printDataCoalitions["PARTY"].unique()
@@ -581,6 +582,70 @@ class VotingData:
 
 
 ##############################################################################################################################
+#### createOnePager #########################################################################################################
+##############################################################################################################################
+
+    def createOnePager(self, year, outputfolder="output"):
+
+        # title variables
+        titleMain = "Wahl " + str(year)
+        subtitleBarResult = "Anteil der Wählerstimmen in Prozent"
+        subtitleBarCompare = "Prozentpunkte im Vergleich zur letzten Wahl"
+        subtitlePieParliament = "Anzahl Sitze im Parlament"
+        subtitleBarCoalitions = "Anzahl Sitze für mögliche Koalitionen"
+
+        # filenames
+        filenameBarResult = "barResult.png"
+        filenameBarCompare = "barDifference.png"
+        filenamePieParliament = "pieParliament.png"
+        filenameBarCoalitions = "barCoalition.png"
+        filenameOnePager = "ElectionResults_"+str(year)+".png"
+
+        # create graphs
+        self.getGraph(year, "BAR_RESULT",
+                      outputfile=os.path.join(outputfolder, filenameBarResult), title=titleMain, subtitle=subtitleBarResult)
+        self.getGraph(year, "BAR_DIFFERENCE",
+                      outputfile=os.path.join(outputfolder, filenameBarCompare), title=titleMain, subtitle=subtitleBarCompare)
+        self.getGraph(year, "PARLIAMENT",
+                      outputfile=os.path.join(outputfolder, filenamePieParliament), title=titleMain, subtitle=subtitlePieParliament)
+        self.getGraph(
+            year,
+            "COALITIONS",
+            outputfile=os.path.join(outputfolder, filenameBarCoalitions),
+            title=titleMain,
+            subtitle=subtitleBarCoalitions,
+        )
+
+        imgBarResult = Image.open("output/barResult.png")
+        imgBarCompare = Image.open("output/barDifference.png")
+        imgPieParliament = Image.open("output/pieParliament.png")
+        imgBarCoalitions = Image.open("output/barCoalition.png")
+
+        widths = (imgBarResult.size[0] + imgBarCompare.size[0],
+                  imgPieParliament.size[0] + imgBarCoalitions.size[0])
+        heights = (imgBarResult.size[1] + imgPieParliament.size[1],
+                   imgBarCompare.size[1] + imgBarCoalitions.size[1])
+
+        # create onePager
+        onePager = Image.new(
+            "RGB",
+            (
+                max(widths),
+                max(heights),
+            ),
+            color=self.colors["background"],
+        )
+
+        onePager.paste(imgBarResult, (0, 0))
+        onePager.paste(imgPieParliament, (0, imgBarResult.size[1]))
+        onePager.paste(imgBarCompare, (imgBarResult.size[0], 0))
+        onePager.paste(
+            imgBarCoalitions, (imgBarResult.size[0], imgBarCompare.size[1]))
+
+        onePager.save(os.path.join(outputfolder, filenameOnePager),
+                      "PNG", resolution=100.0)
+
+##############################################################################################################################
 ##############################################################################################################################
 ##############################################################################################################################
 
@@ -595,16 +660,4 @@ votingData = VotingData(
     120,
 )
 
-# votingData.getGraph(2021, "BAR_RESULT",
-#                    outputfile="output/barResult.png", title="Wahl 2021", subtitle="Anteil der Wählerstimmen in Prozent")
-# votingData.getGraph(2021, "BAR_DIFFERENCE",
-#                   outputfile="output/barDifference.png", title="Wahl 2021", subtitle="Prozentpunkte im Vergleich zur letzten Wahl")
-# votingData.getGraph(2021, "PARLIAMENT",
-#                   outputfile="output/graphParliament.png", title="Wahl 2021", subtitle="Anzahl Sitze im Parlament")
-votingData.getGraph(
-    2017,
-    "COALITIONS",
-    outputfile="output/graphCoalition.png",
-    title="Wahl 2017",
-    subtitle="Anzahl Sitze für mögliche Koalitionen",
-)
+votingData.createOnePager(2021)

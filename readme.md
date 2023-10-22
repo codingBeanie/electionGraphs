@@ -10,10 +10,10 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 ![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barDifference.png "Example Chart")
 
 ### Parliament Seat Distribution
-![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/graphParliament.png "Example Chart")
+![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/pieParliament.png "Example Chart")
 
 ## Coalition Chart
-![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/graphCoalition.png "Example Chart")
+![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barCoalition.png "Example Chart")
 
 ## Goals
 * :white_check_mark: done / implemented 
