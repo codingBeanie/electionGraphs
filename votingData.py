@@ -7,7 +7,7 @@ from itertools import combinations
 import plotly.express as plotly
 import plotly.graph_objects as go
 from plotly.io import to_image
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 
 # REFACTOR
@@ -27,7 +27,7 @@ class VotingData:
         parliamentSeats,
         seperator=";",
         percentageLimit=5,
-        scale=3,
+        scale=1,
     ):
         # read the csv and create the base dataFrame
         self.dataFrame = pd.read_csv(csvFile, sep=seperator)
@@ -43,6 +43,8 @@ class VotingData:
         self.columnColor = columnColor
         self.percentageLimit = percentageLimit
         self.scale = scale
+        self.width = 1200
+        self.height = 800
 
         ###########################################################
         # Styling Variable
@@ -59,12 +61,14 @@ class VotingData:
             "threshold": "#DFD7BF",
         }
 
+        self.fontfamily = "Futura"
+
         self.fontsize = {
-            "title": 32,
-            "subtitle": 16,
-            "values": 16,
-            "yaxis": 10,
-            "xaxis": 18,
+            "title": 42,
+            "subtitle": 32,
+            "values": 24,
+            "yaxis": 18,
+            "xaxis": 28,
         }
 
         yearsInDataFrame = sorted(self.dataFrame[self.columnYear].unique())
@@ -271,33 +275,29 @@ class VotingData:
                 color=self.columnParty,
                 color_discrete_sequence=partyColors,
                 text="VOTINGS_RELATIVE",
+                width=self.width,
+                height=self.height,
             )
 
             # configure layout and other visuals
             barResult.update_layout(
-                title={
-                    "text": "<b>" + title + "</b>",
-                    "font": {
-                        "size": self.fontsize["title"],
-                        "color": self.colors["title"],
-                    },
-                    "x": 0.06,
-                    "y": 0.97,
-                },
+                title=dict(text="<b>" + title + "</b>", font=dict(family=self.fontfamily,
+                                                                  size=self.fontsize["title"], color=self.colors["title"]), x=0.04, y=0.97,),
                 paper_bgcolor=self.colors["background"],
                 plot_bgcolor=self.colors["diagram"],
                 showlegend=False,
-                margin={"t": 70, "b": 0, "l": 0, "r": 20},
+                margin={"t": 120, "b": 0, "l": 0, "r": 20},
                 yaxis=dict(range=yRange, gridcolor=self.colors["grid"]),
                 annotations=[
                     dict(
                         x=0,
-                        y=1.08,
+                        y=1.09,
                         xref="paper",
                         yref="paper",
                         text="<i>" + subtitle + "</i>",
                         showarrow=False,
                         font=dict(
+                            family=self.fontfamily,
                             size=self.fontsize["subtitle"],
                             color=self.colors["subtitle"],
                         ),
@@ -306,15 +306,16 @@ class VotingData:
             )
             barResult.update_xaxes(
                 title="",
-                tickfont=dict(
-                    size=self.fontsize["xaxis"], color=self.colors["xaxis"]),
+                tickfont=dict(family=self.fontfamily,
+                              size=self.fontsize["xaxis"], color=self.colors["xaxis"]),
             )
             barResult.update_yaxes(
                 title="",
-                tickfont=dict(
-                    size=self.fontsize["yaxis"], color=self.colors["yaxis"]),
+                tickfont=dict(family=self.fontfamily,
+                              size=self.fontsize["yaxis"], color=self.colors["yaxis"]),
             )
             barResult.update_traces(
+                textfont=dict(family=self.fontfamily),
                 textfont_size=self.fontsize["values"],
                 textposition="outside",
                 textfont_color=self.colors["values"],
@@ -329,7 +330,7 @@ class VotingData:
             )
 
             # export as png
-            image_bytes = to_image(barResult, format="png", scale=self.scale)
+            image_bytes = to_image(barResult, format="png")
             with open(outputfile, "wb") as f:
                 f.write(image_bytes)
 
@@ -345,23 +346,18 @@ class VotingData:
                 color=self.columnParty,
                 color_discrete_sequence=partyColors,
                 text="VOTINGS_RELATIVE_DIFF",
+                width=self.width,
+                height=self.height,
             )
 
             # configure layout and other visuals
             barDifference.update_layout(
-                title={
-                    "text": "<b>" + title + "</b>",
-                    "font": {
-                        "size": self.fontsize["title"],
-                        "color": self.colors["title"],
-                    },
-                    "x": 0.07,
-                    "y": 0.97,
-                },
+                title=dict(text="<b>" + title + "</b>", font=dict(family=self.fontfamily,
+                                                                  size=self.fontsize["title"], color=self.colors["title"]), x=0.05, y=0.97,),
                 showlegend=False,
                 paper_bgcolor=self.colors["background"],
                 plot_bgcolor=self.colors["diagram"],
-                margin={"t": 70, "b": 0, "l": 0, "r": 20},
+                margin={"t": 120, "b": 0, "l": 0, "r": 20},
                 yaxis=dict(
                     range=[
                         round(printData["VOTINGS_RELATIVE_DIFF"].min(), 0) - 2,
@@ -372,29 +368,30 @@ class VotingData:
                 annotations=[
                     dict(
                         x=0,
-                        y=1.08,
+                        y=1.09,
                         xref="paper",
                         yref="paper",
                         text="<i>" + subtitle + "</i>",
                         showarrow=False,
-                        font=dict(
-                            size=self.fontsize["subtitle"],
-                            color=self.colors["subtitle"],
-                        ),
+                        font=dict(family=self.fontfamily,
+                                  size=self.fontsize["subtitle"],
+                                  color=self.colors["subtitle"],
+                                  ),
                     )
                 ],
             )
             barDifference.update_xaxes(
                 title="",
-                tickfont=dict(
-                    size=self.fontsize["xaxis"], color=self.colors["xaxis"]),
+                tickfont=dict(family=self.fontfamily,
+                              size=self.fontsize["xaxis"], color=self.colors["xaxis"]),
             )
             barDifference.update_yaxes(
                 title="",
-                tickfont=dict(
-                    size=self.fontsize["yaxis"], color=self.colors["yaxis"]),
+                tickfont=dict(family=self.fontfamily,
+                              size=self.fontsize["yaxis"], color=self.colors["yaxis"]),
             )
             barDifference.update_traces(
+                textfont=dict(family=self.fontfamily),
                 textfont_size=self.fontsize["values"],
                 textposition="outside",
                 textfont_color=self.colors["values"],
@@ -402,7 +399,7 @@ class VotingData:
 
             # export as png
             image_bytes = to_image(
-                barDifference, format="png", scale=self.scale)
+                barDifference, format="png")
             with open(outputfile, "wb") as f:
                 f.write(image_bytes)
 
@@ -437,10 +434,10 @@ class VotingData:
                         values=printDataParliament["SEATS"],
                         title=dict(
                             text="<i>" + subtitle + "</i>",
-                            font=dict(
-                                size=self.fontsize["subtitle"],
-                                color=self.colors["subtitle"],
-                            ),
+                            font=dict(family=self.fontfamily,
+                                      size=self.fontsize["subtitle"] * 2,
+                                      color=self.colors["subtitle"],
+                                      ),
                             position="top left",
                         ),
                         text=printDataParliament[self.columnParty]
@@ -449,8 +446,9 @@ class VotingData:
                         + ")",
                         textinfo="text",
                         marker_colors=printDataParliament[self.columnColor],
-                        textfont_size=self.fontsize["values"],
-                        # textfont=dict(color=self.colors["values"]),
+                        textfont_size=self.fontsize["values"] * 2,
+                        textposition='inside',
+                        # insidetextorientation="horizontal",
                         hole=0.3,
                         sort=False,
                         direction="clockwise",
@@ -458,37 +456,38 @@ class VotingData:
                         showlegend=False,
                     )
                 ],
+                layout=go.Layout(width=self.width, height=self.height * 2),
             )
             graphParliament.update_layout(
-                margin=dict(l=0, r=0, t=40, b=0),
+                margin=dict(l=20, r=20, t=0, b=0),
                 paper_bgcolor=self.colors["background"],
-                font=dict(color=self.colors["values"]),
+                font=dict(
+                    color=self.colors["values"], family=self.fontfamily),
                 annotations=[
                     dict(
-                        x=0.18,
-                        y=1.08,
+                        x=0.0,
+                        y=0.95,
                         xref="paper",
                         yref="paper",
                         text="<b>" + title + "</b>",
                         showarrow=False,
-                        font=dict(
-                            size=self.fontsize["title"], color=self.colors["title"]
-                        ),
+                        font=dict(family=self.fontfamily,
+                                  size=self.fontsize["title"] * 2, color=self.colors["title"]
+                                  ),
                     )
                 ],
             )
             # export as png
             image_bytes = to_image(
-                graphParliament, format="png", scale=self.scale * 1.8
+                graphParliament, format="png"
             )
             with open(outputfile, "wb") as f:
                 f.write(image_bytes)
                 # get image width
             with Image.open(outputfile) as img:
-                width, height = img.size
                 # crop image
-                img.crop((0.1 * width, 0, width * 0.9,
-                         height * 0.60)).save(outputfile)
+                img.crop((0, self.height * 0.1, self.width, self.height * 1.1)
+                         ).save(outputfile)
 
         ##############################################################################################################################
         #### coalitionsGraph #########################################################################################################
@@ -531,16 +530,18 @@ class VotingData:
                 text="PARTY",
                 orientation="h",
                 barmode="stack",
+                width=self.width,
+                height=self.height,
             )
 
             coalitionsGraph.update_traces(
-                textposition="inside", insidetextanchor='middle', textfont_size=self.fontsize["values"])
+                textposition="inside", insidetextanchor='middle', textfont_size=self.fontsize["values"], textfont=dict(family=self.fontfamily))
             coalitionsGraph.update_layout(
                 title=dict(
                     text="<b>" + title + "</b>",
-                    font=dict(
-                        size=self.fontsize["title"], color=self.colors["title"]),
-                    x=0.03,
+                    font=dict(family=self.fontfamily,
+                              size=self.fontsize["title"], color=self.colors["title"]),
+                    x=0.02,
                     y=0.98,
                 ),
                 annotations=[
@@ -551,20 +552,21 @@ class VotingData:
                         yref="paper",
                         text="<i>" + subtitle + "</i>",
                         showarrow=False,
-                        font=dict(
-                            size=self.fontsize["subtitle"],
-                            color=self.colors["subtitle"],
-                        ),
+                        font=dict(family=self.fontfamily,
+                                  size=self.fontsize["subtitle"],
+                                  color=self.colors["subtitle"],
+                                  ),
                     )
                 ],
                 bargap=0.5,
                 paper_bgcolor=self.colors["background"],
                 plot_bgcolor=self.colors["diagram"],
                 showlegend=False,
-                margin={"t": 70, "b": 0, "l": 0, "r": 20},
-                yaxis=dict(
-                    gridcolor=self.colors["diagram"], title="", showticklabels=False),
-                xaxis=dict(title="", gridcolor=self.colors["grid"]),
+                margin={"t": 120, "b": 0, "l": 0, "r": 20},
+                yaxis=dict(tickfont=dict(family=self.fontfamily),
+                           gridcolor=self.colors["diagram"], title="", showticklabels=False),
+                xaxis=dict(tickfont=dict(family=self.fontfamily),
+                           title="", gridcolor=self.colors["grid"]),
             ),
 
             # add line for majority
@@ -576,7 +578,7 @@ class VotingData:
             )
             # export as png
             image_bytes = to_image(
-                coalitionsGraph, format="png", scale=self.scale)
+                coalitionsGraph, format="png")
             with open(outputfile, "wb") as f:
                 f.write(image_bytes)
 
@@ -585,10 +587,15 @@ class VotingData:
 #### createOnePager #########################################################################################################
 ##############################################################################################################################
 
+
     def createOnePager(self, year, outputfolder="output"):
 
         # title variables
-        titleMain = "Wahl " + str(year)
+        titleMain = "Wahlergebnisse " + str(year)
+        titleBarResult = "Wählerstimmen"
+        titleBarCompare = "Veränderung der Wählerstimmen"
+        titlePieParliament = "Sitzverteilung"
+        titleBarCoalitions = "Koalitionen"
         subtitleBarResult = "Anteil der Wählerstimmen in Prozent"
         subtitleBarCompare = "Prozentpunkte im Vergleich zur letzten Wahl"
         subtitlePieParliament = "Anzahl Sitze im Parlament"
@@ -603,47 +610,64 @@ class VotingData:
 
         # create graphs
         self.getGraph(year, "BAR_RESULT",
-                      outputfile=os.path.join(outputfolder, filenameBarResult), title=titleMain, subtitle=subtitleBarResult)
+                      outputfile=os.path.join(outputfolder, filenameBarResult), title=titleBarResult, subtitle=subtitleBarResult)
         self.getGraph(year, "BAR_DIFFERENCE",
-                      outputfile=os.path.join(outputfolder, filenameBarCompare), title=titleMain, subtitle=subtitleBarCompare)
+                      outputfile=os.path.join(outputfolder, filenameBarCompare), title=titleBarCompare, subtitle=subtitleBarCompare)
         self.getGraph(year, "PARLIAMENT",
-                      outputfile=os.path.join(outputfolder, filenamePieParliament), title=titleMain, subtitle=subtitlePieParliament)
+                      outputfile=os.path.join(outputfolder, filenamePieParliament), title=titlePieParliament, subtitle=subtitlePieParliament)
         self.getGraph(
             year,
             "COALITIONS",
             outputfile=os.path.join(outputfolder, filenameBarCoalitions),
-            title=titleMain,
+            title=titleBarCoalitions,
             subtitle=subtitleBarCoalitions,
         )
 
+        # open images
         imgBarResult = Image.open("output/barResult.png")
         imgBarCompare = Image.open("output/barDifference.png")
         imgPieParliament = Image.open("output/pieParliament.png")
         imgBarCoalitions = Image.open("output/barCoalition.png")
 
+        # dimensions
+
         widths = (imgBarResult.size[0] + imgBarCompare.size[0],
                   imgPieParliament.size[0] + imgBarCoalitions.size[0])
         heights = (imgBarResult.size[1] + imgPieParliament.size[1],
                    imgBarCompare.size[1] + imgBarCoalitions.size[1])
+        imgWidth = int(max(widths) * 1.1)
+        imgHeight = int(max(heights) * 1.2)
+        margin = dict(l=int(imgWidth*0.02), r=int(imgWidth*0.02),
+                      t=int(imgHeight*0.1), b=int(imgHeight*0.05))
 
         # create onePager
         onePager = Image.new(
             "RGB",
             (
-                max(widths),
-                max(heights),
+                imgWidth,
+                imgHeight,
             ),
             color=self.colors["background"],
         )
 
-        onePager.paste(imgBarResult, (0, 0))
+        # add graphs to onePager
+        onePager.paste(imgBarResult, (margin["l"], margin["t"]))
         onePager.paste(imgPieParliament, (0, imgBarResult.size[1]))
-        onePager.paste(imgBarCompare, (imgBarResult.size[0], 0))
-        onePager.paste(
-            imgBarCoalitions, (imgBarResult.size[0], imgBarCompare.size[1]))
+       # onePager.paste(imgBarCompare, (imgBarResult.size[0], 0))
+       # onePager.paste(
+       #     imgBarCoalitions, (imgBarResult.size[0], imgBarCompare.size[1]))
 
+        # add title
         onePager.save(os.path.join(outputfolder, filenameOnePager),
                       "PNG", resolution=100.0)
+        finalPager = Image.open(os.path.join(outputfolder, filenameOnePager))
+        draw = ImageDraw.Draw(finalPager)
+        font = ImageFont.truetype("fonts/Futura.ttc", 240)
+        draw.text((margin["l"], margin["t"] / 6), titleMain, font=font, fill=self.colors["title"],
+                  )
+        finalPager.save(os.path.join(outputfolder, filenameOnePager),
+                        "PNG")
+
 
 ##############################################################################################################################
 ##############################################################################################################################
@@ -659,5 +683,13 @@ votingData = VotingData(
     "PARTY_COLOR",
     120,
 )
-
+# votingData.getGraph(2021, "BAR_RESULT", "output/barResult.png",
+#                    title="Wahlergebnis 2021", subtitle="Anteil der Wählerstimmen in Prozent")
+# votingData.getGraph(2021, "BAR_DIFFERENCE", "output/barDifference.png",
+#                    title="Wahlergebnis 2021", subtitle="Prozentpunkte im Vergleich zur letzten Wahl")
+# votingData.getGraph(2021, "PARLIAMENT", "output/pieParliament.png",
+#                    title="Wahlergebnis 2021", subtitle="Anzahl Sitze im Parlament")
+# votingData.getGraph(2021, "COALITIONS", "output/barCoalition.png",
+#                    title="Wahlergebnis 2021", subtitle="Anzahl Sitze für mögliche Koalitionen")
+votingData.titleBarResult = "TEST"
 votingData.createOnePager(2021)
