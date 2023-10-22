@@ -414,7 +414,7 @@ class VotingData:
 
             # sort by politcal spectrum
             printDataParliament = printDataParliament.sort_values(
-                by=[self.columnSpectrum], ascending=False
+                by=[self.columnSpectrum], ascending=True
             )
             # add dummy row for displaying half-circle
             printDataParliament = printDataParliament._append(
@@ -435,7 +435,7 @@ class VotingData:
                         title=dict(
                             text="<i>" + subtitle + "</i>",
                             font=dict(family=self.fontfamily,
-                                      size=self.fontsize["subtitle"] * 2,
+                                      size=self.fontsize["subtitle"],
                                       color=self.colors["subtitle"],
                                       ),
                             position="top left",
@@ -446,7 +446,7 @@ class VotingData:
                         + ")",
                         textinfo="text",
                         marker_colors=printDataParliament[self.columnColor],
-                        textfont_size=self.fontsize["values"] * 2,
+                        textfont_size=self.fontsize["values"],
                         textposition='inside',
                         # insidetextorientation="horizontal",
                         hole=0.3,
@@ -466,13 +466,13 @@ class VotingData:
                 annotations=[
                     dict(
                         x=0.0,
-                        y=0.95,
+                        y=0.91,
                         xref="paper",
                         yref="paper",
                         text="<b>" + title + "</b>",
                         showarrow=False,
                         font=dict(family=self.fontfamily,
-                                  size=self.fontsize["title"] * 2, color=self.colors["title"]
+                                  size=self.fontsize["title"], color=self.colors["title"]
                                   ),
                     )
                 ],
@@ -486,7 +486,7 @@ class VotingData:
                 # get image width
             with Image.open(outputfile) as img:
                 # crop image
-                img.crop((0, self.height * 0.1, self.width, self.height * 1.1)
+                img.crop((0, self.height * 0.18, self.width, self.height * 1.18)
                          ).save(outputfile)
 
         ##############################################################################################################################
@@ -587,7 +587,6 @@ class VotingData:
 #### createOnePager #########################################################################################################
 ##############################################################################################################################
 
-
     def createOnePager(self, year, outputfolder="output"):
 
         # title variables
@@ -630,15 +629,12 @@ class VotingData:
         imgBarCoalitions = Image.open("output/barCoalition.png")
 
         # dimensions
-
-        widths = (imgBarResult.size[0] + imgBarCompare.size[0],
-                  imgPieParliament.size[0] + imgBarCoalitions.size[0])
-        heights = (imgBarResult.size[1] + imgPieParliament.size[1],
-                   imgBarCompare.size[1] + imgBarCoalitions.size[1])
-        imgWidth = int(max(widths) * 1.1)
-        imgHeight = int(max(heights) * 1.2)
-        margin = dict(l=int(imgWidth*0.02), r=int(imgWidth*0.02),
-                      t=int(imgHeight*0.1), b=int(imgHeight*0.05))
+        spaceTitle = int(self.height * 0.3)
+        spaceGraphMargins = (int(self.width * 0.05), int(self.height * 0.05))
+        imgWidth = int(self.width * 2 + spaceGraphMargins[0] * 3)
+        imgHeight = int(self.height * 2 +
+                        spaceGraphMargins[1] * 3 + spaceTitle)
+        print(imgWidth, imgHeight)
 
         # create onePager
         onePager = Image.new(
@@ -647,23 +643,27 @@ class VotingData:
                 imgWidth,
                 imgHeight,
             ),
-            color=self.colors["background"],
+            color=self.colors["diagram"],
         )
 
         # add graphs to onePager
-        onePager.paste(imgBarResult, (margin["l"], margin["t"]))
-        onePager.paste(imgPieParliament, (0, imgBarResult.size[1]))
-       # onePager.paste(imgBarCompare, (imgBarResult.size[0], 0))
-       # onePager.paste(
-       #     imgBarCoalitions, (imgBarResult.size[0], imgBarCompare.size[1]))
+        onePager.paste(
+            imgBarResult, (spaceGraphMargins[0], spaceTitle + spaceGraphMargins[1]))
+        onePager.paste(
+            imgPieParliament, (spaceGraphMargins[0], self.height + spaceGraphMargins[1] * 2 + spaceTitle))
+        onePager.paste(imgBarCompare, (self.width +
+                       spaceGraphMargins[0] * 2, spaceTitle + spaceGraphMargins[1]))
+        onePager.paste(
+            imgBarCoalitions, (self.width +
+                               spaceGraphMargins[0] * 2, self.height + spaceGraphMargins[1] * 2 + spaceTitle))
 
         # add title
         onePager.save(os.path.join(outputfolder, filenameOnePager),
-                      "PNG", resolution=100.0)
+                      "PNG")
         finalPager = Image.open(os.path.join(outputfolder, filenameOnePager))
         draw = ImageDraw.Draw(finalPager)
-        font = ImageFont.truetype("fonts/Futura.ttc", 240)
-        draw.text((margin["l"], margin["t"] / 6), titleMain, font=font, fill=self.colors["title"],
+        font = ImageFont.truetype("fonts/Futura.ttc", 140)
+        draw.text((spaceGraphMargins[0], spaceGraphMargins[1]), titleMain, font=font, fill=self.colors["title"],
                   )
         finalPager.save(os.path.join(outputfolder, filenameOnePager),
                         "PNG")
