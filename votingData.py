@@ -3,16 +3,12 @@
 ###########################################################
 import pandas as pd
 import os
+import numpy as np
 from itertools import combinations
 import plotly.express as plotly
 import plotly.graph_objects as go
 from plotly.io import to_image
 from PIL import Image, ImageDraw, ImageFont
-
-
-# REFACTOR
-# use dict() instead of "x":0.4,
-# check if update-layout is necessary
 
 
 class VotingData:
@@ -27,7 +23,8 @@ class VotingData:
         parliamentSeats,
         seperator=";",
         percentageLimit=5,
-        scale=1,
+        excludeParties=["Sonstiges", "Sonstige",
+                        "Sonstige Parteien", "Sonstige Partei"],
     ):
         # read the csv and create the base dataFrame
         self.dataFrame = pd.read_csv(csvFile, sep=seperator)
@@ -42,9 +39,11 @@ class VotingData:
         self.columnSpectrum = columnSpectrum
         self.columnColor = columnColor
         self.percentageLimit = percentageLimit
-        self.scale = scale
         self.width = 1200
         self.height = 800
+        self.excludeParties = excludeParties
+        self.yearsInDataFrame = sorted(
+            self.dataFrame[self.columnYear].unique())
 
         ###########################################################
         # Styling Variable
@@ -58,7 +57,7 @@ class VotingData:
             "xaxis": "#3F2305",
             "grid": "#DFD7BF",
             "values": "#3F2305",
-            "threshold": "#DFD7BF",
+            "threshold": "#F99417",
         }
 
         self.fontfamily = "Futura"
@@ -71,42 +70,94 @@ class VotingData:
             "xaxis": 28,
         }
 
-        yearsInDataFrame = sorted(self.dataFrame[self.columnYear].unique())
+        ###########################################################
+        # Text Variables
+        ##########################################################
+        self.titleMain = "Wahlergebnisse"
+        self.titleBarResult = "Wählerstimmen"
+        self.titleBarCompare = "Veränderung der Wählerstimmen"
+        self.titlePieParliament = "Sitzverteilung"
+        self.titleBarCoalitions = "Koalitionen"
+        self.subtitleBarResult = "Anteil der Wählerstimmen in Prozent"
+        self.subtitleBarCompare = "Prozentpunkte im Vergleich zur letzten Wahl"
+        self.subtitlePieParliament = "Anzahl Sitze im Parlament"
+        self.subtitleBarCoalitions = "Anzahl Sitze für mögliche Koalitionen"
+
+        ###########################################################
+        # Filenames
+        ##########################################################
+        self.filenameBarResult = "barResult.png"
+        self.filenameBarCompare = "barDifference.png"
+        self.filenamePieParliament = "pieParliament.png"
+        self.filenameBarCoalitions = "barCoalition.png"
+        self.filenameOnePager = "ElectionResults"
 
         ###########################################################
         # data processing
         ###########################################################
 
         # calculate the total and relative votes for each year in dataFrame
-        for year in yearsInDataFrame:
+        for year in self.yearsInDataFrame:
+            # get all votes
             totalVotes = self.dataFrame.loc[
                 self.dataFrame[self.columnYear] == year, columnVotings
             ].sum()
+
+            # calculate the relative votes for each party
             self.dataFrame.loc[
                 self.dataFrame[self.columnYear] == year, "VOTINGS_RELATIVE"
             ] = round(self.dataFrame[columnVotings] / totalVotes * 100, 3)
-            # sum of all votes that are above 5%
+
+            # sum of all votes that are above 5% and not in excludeParties
             totalVotesAboveLimit = self.dataFrame.loc[
                 (self.dataFrame[self.columnYear] == year)
-                & (self.dataFrame["VOTINGS_RELATIVE"] >= percentageLimit),
+                & (self.dataFrame["VOTINGS_RELATIVE"] >= self.percentageLimit) & (self.dataFrame[self.columnParty].isin(excludeParties) == False),
                 columnVotings,
             ].sum()
 
             # calculate the number of seats for each party which is above the percentage limit
+            # get the modulus of the seat calculation to later correct for rounding errors
             self.dataFrame.loc[
                 (self.dataFrame[self.columnYear] == year)
-                & (self.dataFrame["VOTINGS_RELATIVE"] >= 5),
-                ["SEATS"],
-            ] = round(
-                parliamentSeats *
-                self.dataFrame[columnVotings] / totalVotesAboveLimit
-            )
+                & (self.dataFrame["VOTINGS_RELATIVE"] >= self.percentageLimit) & (self.dataFrame[self.columnParty].isin(excludeParties) == False),
+                ["ROUNDED_SEATS"]
+            ] = np.mod(parliamentSeats * self.dataFrame[columnVotings], totalVotesAboveLimit)
+
+            # calculate the number of seats for each party which is above the percentage limit
+            # rounded down / floored values
+            self.dataFrame.loc[
+                (self.dataFrame[self.columnYear] == year)
+                & (self.dataFrame["VOTINGS_RELATIVE"] >= self.percentageLimit) & (self.dataFrame[self.columnParty].isin(excludeParties) == False),
+                ["SEATS"]
+            ] = np.floor(parliamentSeats * self.dataFrame[columnVotings] / totalVotesAboveLimit)
             self.dataFrame["SEATS"] = self.dataFrame["SEATS"].fillna(0)
             self.dataFrame["SEATS"] = self.dataFrame["SEATS"].astype(int)
 
+            # re-add the rounding error to the party with the highest decimal value
+            # loop through all parties and adding 1 seat to each party, starting witch the party with the highest decimal value
+            seatDifference = self.parliamentSeats - self.dataFrame.loc[self.dataFrame[self.columnYear]
+                                                                       == year, "SEATS"].sum()
+            if seatDifference > 0:
+                # sort the dataFrame by the decimal value
+                roundData = self.dataFrame.loc[self.dataFrame[self.columnYear] == year, [
+                    self.columnYear, self.columnParty, "ROUNDED_SEATS", "SEATS"]]
+                roundData = roundData.sort_values(
+                    by=["ROUNDED_SEATS"], ascending=False)
+                for r in range(1, seatDifference + 1):
+                    # add 1 seat to the party
+                    party = roundData.iloc[r - 1, 1]
+                    # add 1 to seats in dataframe where party and year match
+                    self.dataFrame.loc[
+                        (self.dataFrame[self.columnYear] == year)
+                        & (self.dataFrame[self.columnParty] == party),
+                        "SEATS",
+                    ] += 1
+
             # Calculate the difference of REL to the previous year
-            for party in self.dataFrame[self.columnParty].unique():
-                for i, year in enumerate(yearsInDataFrame):
+            for i, year in enumerate(self.yearsInDataFrame):
+                parties = self.dataFrame[self.dataFrame[self.columnYear]
+                                         == year][self.columnParty].unique()
+                for party in parties:
                     if i != 0:
                         # filter the dataFrame by year and party and calculate the difference
                         currentRel = self.dataFrame.loc[
@@ -114,13 +165,16 @@ class VotingData:
                             & (self.dataFrame[self.columnParty] == party),
                             "VOTINGS_RELATIVE",
                         ].values[0]
-                        previousRel = self.dataFrame.loc[
-                            (self.dataFrame[self.columnYear]
-                             == yearsInDataFrame[i - 1])
-                            & (self.dataFrame[self.columnParty] == party),
-                            "VOTINGS_RELATIVE",
-                        ].values[0]
-                        difference = round(currentRel - previousRel, 3)
+                        try:
+                            previousRel = self.dataFrame.loc[
+                                (self.dataFrame[self.columnYear]
+                                 == self.yearsInDataFrame[i - 1])
+                                & (self.dataFrame[self.columnParty] == party),
+                                "VOTINGS_RELATIVE",
+                            ].values[0]
+                            difference = round(currentRel - previousRel, 3)
+                        except:
+                            difference = None
 
                         # add the difference to the dataFrame
                         self.dataFrame.loc[
@@ -139,7 +193,7 @@ class VotingData:
     ##### getCoalitions #########################################################################################################
     ##############################################################################################################################
 
-    def getCoalitions(self, year, thresholdPolitcalDistance=300, deleteSubsets=True):
+    def getCoalitions(self, year, thresholdPolitcalDistance=200, deleteSubsets=True):
         dataParties = self.dataFrame.loc[
             (self.dataFrame[self.columnYear] == year) & (
                 self.dataFrame["SEATS"] > 0)
@@ -228,6 +282,7 @@ class VotingData:
         dataCoalitions = dataCoalitions.sort_values(
             by="POLITCAL_DISTANCE", ascending=True
         )
+        dataCoalitions.reset_index(drop=True, inplace=True)
         return dataCoalitions
 
     ##############################################################################################################################
@@ -254,13 +309,13 @@ class VotingData:
         # for a mostly uniform look, the yaxis range is set based on the maximum value
         maxValue = printData["VOTINGS_RELATIVE"].max()
         if maxValue > 80:
-            yRange = [0, 100]
+            self.yRange = [0, 100]
         elif maxValue > 60:
-            yRange = [0, 85]
+            self.yRange = [0, 85]
         elif maxValue > 40:
-            yRange = [0, 65]
+            self.yRange = [0, 65]
         elif maxValue > 20:
-            yRange = [0, 45]
+            self.yRange = [0, 45]
 
         ############################################################################################
         # BAR_RESULT
@@ -287,7 +342,7 @@ class VotingData:
                 plot_bgcolor=self.colors["diagram"],
                 showlegend=False,
                 margin={"t": 120, "b": 0, "l": 0, "r": 20},
-                yaxis=dict(range=yRange, gridcolor=self.colors["grid"]),
+                yaxis=dict(range=self.yRange, gridcolor=self.colors["grid"]),
                 annotations=[
                     dict(
                         x=0,
@@ -407,10 +462,8 @@ class VotingData:
         # PARLIAMENT GRAPH
         ############################################################################################
         if type == "PARLIAMENT":
-            # filter the dataFrame by the threshold
-            printDataParliament = printData.loc[
-                (printData["VOTINGS_RELATIVE"] >= self.percentageLimit)
-            ]
+            # filter by parties that are above the percentage limit and exclude parties
+            printDataParliament = printData.loc[printData["SEATS"] > 0]
 
             # sort by politcal spectrum
             printDataParliament = printDataParliament.sort_values(
@@ -496,6 +549,7 @@ class VotingData:
             printDataCoalitions = pd.DataFrame(
                 columns=["COALITION", "PARTY", "SEATS"])
             coalitions = self.getCoalitions(year)
+
             for i in range(len(coalitions)):
                 for p in coalitions.loc[i, "PARTIES"]:
                     partySeats = self.dataFrame.loc[
@@ -503,12 +557,14 @@ class VotingData:
                         & (self.dataFrame[self.columnParty] == p),
                         "SEATS",
                     ].values[0]
+                    politcalDistance = coalitions.loc[i, "POLITCAL_DISTANCE"]
                     printDataCoalitions = printDataCoalitions._append(
-                        dict(COALITION=i, PARTY=p, SEATS=partySeats), ignore_index=True
+                        dict(COALITION=i, POLITICAL_DISTANCE=politcalDistance, PARTY=p, SEATS=partySeats), ignore_index=True
                     )
             # sort by coalition and then seats
             printDataCoalitions = printDataCoalitions.sort_values(
                 by=["COALITION", "SEATS"], ascending=[True, False])
+
             partyArray = printDataCoalitions["PARTY"].unique()
             partyColorsCoalitions = []
             for p in partyArray:
@@ -587,39 +643,26 @@ class VotingData:
 #### createOnePager #########################################################################################################
 ##############################################################################################################################
 
-    def createOnePager(self, year, outputfolder="output"):
+    def createOnePager(self, year=None, outputfolder="output"):
 
-        # title variables
-        titleMain = "Wahlergebnisse " + str(year)
-        titleBarResult = "Wählerstimmen"
-        titleBarCompare = "Veränderung der Wählerstimmen"
-        titlePieParliament = "Sitzverteilung"
-        titleBarCoalitions = "Koalitionen"
-        subtitleBarResult = "Anteil der Wählerstimmen in Prozent"
-        subtitleBarCompare = "Prozentpunkte im Vergleich zur letzten Wahl"
-        subtitlePieParliament = "Anzahl Sitze im Parlament"
-        subtitleBarCoalitions = "Anzahl Sitze für mögliche Koalitionen"
-
-        # filenames
-        filenameBarResult = "barResult.png"
-        filenameBarCompare = "barDifference.png"
-        filenamePieParliament = "pieParliament.png"
-        filenameBarCoalitions = "barCoalition.png"
-        filenameOnePager = "ElectionResults_"+str(year)+".png"
+        if year == None:
+            for y in self.yearsInDataFrame:
+                self.createOnePager(y)
+            exit()
 
         # create graphs
         self.getGraph(year, "BAR_RESULT",
-                      outputfile=os.path.join(outputfolder, filenameBarResult), title=titleBarResult, subtitle=subtitleBarResult)
+                      outputfile=os.path.join(outputfolder, self.filenameBarResult), title=self.titleBarResult, subtitle=self.subtitleBarResult)
         self.getGraph(year, "BAR_DIFFERENCE",
-                      outputfile=os.path.join(outputfolder, filenameBarCompare), title=titleBarCompare, subtitle=subtitleBarCompare)
+                      outputfile=os.path.join(outputfolder, self.filenameBarCompare), title=self.titleBarCompare, subtitle=self.subtitleBarCompare)
         self.getGraph(year, "PARLIAMENT",
-                      outputfile=os.path.join(outputfolder, filenamePieParliament), title=titlePieParliament, subtitle=subtitlePieParliament)
+                      outputfile=os.path.join(outputfolder, self.filenamePieParliament), title=self.titlePieParliament, subtitle=self.subtitlePieParliament)
         self.getGraph(
             year,
             "COALITIONS",
-            outputfile=os.path.join(outputfolder, filenameBarCoalitions),
-            title=titleBarCoalitions,
-            subtitle=subtitleBarCoalitions,
+            outputfile=os.path.join(outputfolder, self.filenameBarCoalitions),
+            title=self.titleBarCoalitions,
+            subtitle=self.subtitleBarCoalitions,
         )
 
         # open images
@@ -634,7 +677,6 @@ class VotingData:
         imgWidth = int(self.width * 2 + spaceGraphMargins[0] * 3)
         imgHeight = int(self.height * 2 +
                         spaceGraphMargins[1] * 3 + spaceTitle)
-        print(imgWidth, imgHeight)
 
         # create onePager
         onePager = Image.new(
@@ -658,14 +700,18 @@ class VotingData:
                                spaceGraphMargins[0] * 2, self.height + spaceGraphMargins[1] * 2 + spaceTitle))
 
         # add title
-        onePager.save(os.path.join(outputfolder, filenameOnePager),
+        self.filenameOutput = self.filenameOnePager + \
+            "_" + str(year) + ".png"
+        onePager.save(os.path.join(outputfolder, self.filenameOutput),
                       "PNG")
-        finalPager = Image.open(os.path.join(outputfolder, filenameOnePager))
+        finalPager = Image.open(os.path.join(
+            outputfolder, self.filenameOutput))
         draw = ImageDraw.Draw(finalPager)
         font = ImageFont.truetype("fonts/Futura.ttc", 140)
-        draw.text((spaceGraphMargins[0], spaceGraphMargins[1]), titleMain, font=font, fill=self.colors["title"],
+        draw.text((spaceGraphMargins[0], spaceGraphMargins[1]), self.titleMain + " " + str(year), font=font, fill=self.colors["title"],
                   )
-        finalPager.save(os.path.join(outputfolder, filenameOnePager),
+
+        finalPager.save(os.path.join(outputfolder, self.filenameOutput),
                         "PNG")
 
 
@@ -683,13 +729,13 @@ votingData = VotingData(
     "PARTY_COLOR",
     120,
 )
-# votingData.getGraph(2021, "BAR_RESULT", "output/barResult.png",
-#                    title="Wahlergebnis 2021", subtitle="Anteil der Wählerstimmen in Prozent")
+votingData.getGraph(2021, "BAR_RESULT", "output/barResult.png",
+                    title="Wahlergebnis 2021 TEST", subtitle="Anteil der Wählerstimmen in Prozent")
 # votingData.getGraph(2021, "BAR_DIFFERENCE", "output/barDifference.png",
 #                    title="Wahlergebnis 2021", subtitle="Prozentpunkte im Vergleich zur letzten Wahl")
 # votingData.getGraph(2021, "PARLIAMENT", "output/pieParliament.png",
 #                    title="Wahlergebnis 2021", subtitle="Anzahl Sitze im Parlament")
 # votingData.getGraph(2021, "COALITIONS", "output/barCoalition.png",
 #                    title="Wahlergebnis 2021", subtitle="Anzahl Sitze für mögliche Koalitionen")
-votingData.titleBarResult = "TEST"
-votingData.createOnePager(2021)
+
+votingData.createOnePager()

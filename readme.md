@@ -33,12 +33,14 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 * :white_check_mark:  add styling options/method for customization (color and font-sizes can be changed)
 
 ### Finish Touch
-* :red_circle: review code and optimize
+* :large_orange_diamond: review code and optimize
 * :red_circle: create documentation
 * :red_circle: create and publish as package
 
-### Known Bugs
-* :red_circle: rounding error/problems where more seats are allocated than the defined maximum
+### Bugs
+* :white_check_mark: rounding error/problems where more seats are allocated than the defined maximum
+* :white_check_mark:  error when party is new and there are no previous years
+* :white_check_mark:  exclude user specific parties (e.g. sum of smaller parties that should not get parliament seats)
 
 ## Dependencies
 * pandas
