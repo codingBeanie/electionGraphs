@@ -13,12 +13,11 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 
 ## VotingGraphs
 ### mandatory 
-* ´csvFile´ = (str) csv file to read in
-* ´columnYear´ = (str) name of column in csv in which the year is recorded
+`csvFile` = *(str)* csv file to read in
+`columnYear` = *(str)* name of column in csv in which the year is recorded
 
 ### optional
 
-### Parameters 
 
 # Project Management
 ## Goals
