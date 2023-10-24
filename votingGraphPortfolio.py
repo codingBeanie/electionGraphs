@@ -42,6 +42,12 @@ class VotingGraphs:
         self.width = 1200
         self.height = 800
         self.excludeParties = ["Sonstiges", "Sonstige", "Other"]
+        self.thresholdPolitcalDistance = 300
+
+        ###########################################################
+        # debugging
+        ###########################################################
+        self.deleteSubsets = True
 
         ###########################################################
         # Styling Variable
@@ -195,7 +201,7 @@ class VotingGraphs:
     ##### getCoalitions #########################################################################################################
     ##############################################################################################################################
 
-    def getCoalitions(self, year, thresholdPolitcalDistance=200, deleteSubsets=True):
+    def getCoalitions(self, year):
         dataParties = self.dataFrame.loc[
             (self.dataFrame[self.columnYear] == year) & (
                 self.dataFrame["SEATS"] > 0)
@@ -257,10 +263,10 @@ class VotingGraphs:
 
                 dataCoalitions = dataCoalitions.loc[
                     (dataCoalitions["MAJORITY"] == True)
-                    & (dataCoalitions["POLITCAL_DISTANCE"] <= thresholdPolitcalDistance)
+                    & (dataCoalitions["POLITCAL_DISTANCE"] <= self.thresholdPolitcalDistance)
                 ]
         # end for
-        if deleteSubsets:
+        if self.deleteSubsets:
             # loop through dataframe and find coalitions that are a subset of other coalitions (which have less parties involved)
             deleteRows = []
             for i in range(len(dataCoalitions)):

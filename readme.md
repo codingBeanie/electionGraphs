@@ -1,15 +1,36 @@
 # Voting Graph Portfolio
 **The Voting Graph Portfolio** creates four different graphs for displaying the result of an election. The graphs can either be created seperately or combined into one chart.
-As input a ´pandas´ ´dataFrame´ needs to be provided. In the initialization the provided ´dataFrame´ will be processed. Relative votings, as well as a seat distribution for a parliament will be calculated and later be displayed.
-This tool is loosly based on german elections. Some rulesets may differ from the reality (e.g. not considering first vote, second vote). This is just a hobby project for practicing data processing and data visualization.
+As input a `csv-file` needs to be provided. In the initialization the data will be processed as `pandas` `dataframe` and graphs from `plotly` can be exported as image-files.
 
-## Quickstart
+## Features
+* data from the csv-file will be processed and more data points will be calculated (initialization)
+* a `.getGraph()` function can create different types of graphs
+* a bar graph showing the results in relative votes can be displayed
+* a bar graph showing a comparision of relative votes to last voting period
+* a pie chart shows the seat allocation of the parliament
+* a stacked bar chart shows possible coalitions
+* `.createOnePager()` creates all graph options and combines them into one chart
 
-## Example Code
+### Seat Allocation (Parliament)
+* seats of a parliament will be allocated based on relative voting results
+* a threshold is implemented, so that a party needs to reach a certain relative voting result in order to be considered in the seat allocation (this feature can be adjusted by parameters)
+* a list of parties can be excluded from the seat allocation (e.g. a "other" category)
+* for the seat allocation the relative results (excluding parties that are defined by the `excludeParties` parameters or by the `percentageLimit`) will be multiplied by `parliamentSeats`, the result will be floored. Not allocated seats will then be allocated each party ordered by the highest modulus (decimal rest from the division) until all seats are allocated
+
+### Coalitions
+* coalitions will be calculated based on total seats. The political spectrum will be considered as a threshold
+* for every possible coaltion the distance based on the delivered information of `columnSpectrum` will be calculated. Reaches the overall distance the `thresholdPoliticalDistance` the coalition will not be included in the final graph
+
+
+## Disclaimer
+*This tool is loosly based on german elections. Some rulesets may differ from the reality (e.g. not considering first vote, second vote). This is just a hobby project for practicing data processing and data visualization.*
 
 ## Example Graph
 ###  One Pager with multiple different graphs
-![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/ElectionResults_2021.png "Example Chart")
+![Example One Pager](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/ElectionResults_2021.png "Example One Pager")
+
+###  One Pager with multiple different graphs
+![Example Bar Resulr](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barResult.png "Example Bar Result")
 
 ## VotingGraphs
 
@@ -89,6 +110,8 @@ votingGraphs.fontsize["titleMain"] = 58
 `parliamentSeats` = *(int, default = 120)* number of seats in parliament
 
 `percentageLimit` = *(int, default = 5)* threshold at which a party will not be considered when calculting seat distribution
+
+`thresholdPolitcalDistance` = *(int, default = 300)* defines a threshold for displaying possible coalitions. When the politcal distance in a mathmatical possible coalition is too high, it can be filtered
 
 `titleBarCoalitions` = *(str, default="Koalitionen")* adjusts title of bar graph with possible coalitions
 
