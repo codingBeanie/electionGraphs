@@ -52,7 +52,7 @@ votingGraphs.fontsize["titleMain"] = 58
 
 ### optional parameters
 
-`colors` = *(dict)* hex-color for different elements of the graphs. The value must be a *str* of hex-color (e.g. `"#F2EAD3"`) with following keys: 
+`colors` = *(dict{str:str})* hex-color for different elements of the graphs. The value must be a *str* of hex-color (e.g. `"#F2EAD3"`) with following keys: 
    `background`
    `diagram`
    `title`
@@ -63,7 +63,16 @@ votingGraphs.fontsize["titleMain"] = 58
    `values` 
    `threshold` 
 
-`excludeParties` = *(list, default = ["Sonstiges", "Sonstige", "Other"])* list of party names which will not be included in the seat allocation
+`excludeParties` = *(list[str], default = ["Sonstiges", "Sonstige", "Other"])* list of party names which will not be included in the seat allocation
+
+`fontfamily` = *(str, default = "Futura")* font family of all graphs
+
+`fontsize` = *(dict{str:int})* font sizes of different elements. Each key represent a text type with following options: 
+   `title`
+   `subtitle`
+   `values`
+   `yaxis`
+   `xaxis`
 
 `parliamentSeats` = *(int, default = 120)* number of seats in parliament
 
