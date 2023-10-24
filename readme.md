@@ -107,6 +107,8 @@ votingGraphs.fontsize["titleMain"] = 58
 
 `height` = *(int, default = 800)* height of a single graph, the onePager will be around two times larger
 
+`outputfolder` = *(str, default = "output")* folder in which all output images will be saved
+
 `parliamentSeats` = *(int, default = 120)* number of seats in parliament
 
 `percentageLimit` = *(int, default = 5)* threshold at which a party will not be considered when calculting seat distribution
@@ -144,16 +146,21 @@ votingGraphs.getGraph(2021, type="BAR_DIFFERENCE")
 ```
 ## mandatory parameters/attributes
 `year` = *(int)* year of data
+
 `type` = *(str, specific options)* type of graph: 
+
    `BAR_RESULT` = bar graph with basic results
+
    `BAR_COMPARE` = bar graph with comparison to last voting year
+
    `PIE_PARLIAMENT` = pie chart for seat distribution in a parliament
+   
    `BAR_COALITIONS` = stacked bar chart with possible coalitions
 
 ## optional parameters/attributes
 Many of the optional parameters/attributes of the main class **VotingGraphs** will be applied to the charts (e.g. titles, colors, fonts, etc.)
 
-## function: createOnePager
+# function: createOnePager
 Creates a png-file with all four chart types arranged
 
 ```python
