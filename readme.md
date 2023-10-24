@@ -74,15 +74,15 @@ votingGraphs.fontsize["titleMain"] = 58
 ## optional parameters/attributes
 
 `colors` = *(dict{str:str})* hex-color for different elements of the graphs. The value must be a *str* of hex-color (e.g. `"#F2EAD3"`) with following keys: 
-   `background`
-   `diagram`
-   `title`
-   `subtitle` 
-   `yaxis` 
-   `xaxis` 
-   `grid` 
-   `values` 
-   `threshold` 
+  * `background`
+  * `diagram`
+  * `title`
+  * `subtitle` 
+  * `yaxis` 
+  * `xaxis` 
+  * `grid` 
+  * `values` 
+  * `threshold` 
 
 `excludeParties` = *(list[str], default = ["Sonstiges", "Sonstige", "Other"])* list of party names which will not be included in the seat allocation
 
@@ -149,13 +149,13 @@ votingGraphs.getGraph(2021, type="BAR_DIFFERENCE")
 
 `type` = *(str, specific options)* type of graph: 
 
-   `BAR_RESULT` = bar graph with basic results
+   * `"BAR_RESULT"` = bar graph with basic results
 
-   `BAR_COMPARE` = bar graph with comparison to last voting year
+   * `"BAR_COMPARE"` = bar graph with comparison to last voting year
 
-   `PIE_PARLIAMENT` = pie chart for seat distribution in a parliament
-   
-   `BAR_COALITIONS` = stacked bar chart with possible coalitions
+   * `"PIE_PARLIAMENT"` = pie chart for seat distribution in a parliament
+
+   * `"BAR_COALITIONS"` = stacked bar chart with possible coalitions
 
 ## optional parameters/attributes
 Many of the optional parameters/attributes of the main class **VotingGraphs** will be applied to the charts (e.g. titles, colors, fonts, etc.)
