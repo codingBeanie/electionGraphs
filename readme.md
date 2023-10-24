@@ -12,7 +12,7 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 ![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/ElectionResults_2021.png "Example Chart")
 
 ## VotingGraphs
-´´´´python
+```python
 from votingGraphPortfolio import VotingGraphs
 
 votingGraphs = VotingGraphs(
@@ -23,7 +23,7 @@ votingGraphs = VotingGraphs(
     "PARTY_SPEC",
     "PARTY_COLOR",
 )
-´´´
+```
 
 
 ### mandatory 
