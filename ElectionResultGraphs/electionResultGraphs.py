@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 ##############################################################################################################################
 
 
-class VotingGraphs:
+class ElectionResultGraphs:
     def __init__(
         self,
         # mandatory input variables
@@ -552,7 +552,7 @@ class VotingGraphs:
                          ).save(os.path.join(self.outputfolder, self.filenamePieParliament))
 
         ############################################################################################################################
-        #### coalitionsGraph 
+        # coalitionsGraph
         #############################################################################################################################
         if type == "BAR_COALITIONS":
             printDataCoalitions = pd.DataFrame(

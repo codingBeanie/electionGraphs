@@ -37,9 +37,10 @@ As input a `csv-file` needs to be provided. In the initialization the data will 
 For the initialization the mandatory parameters must be given.
 
 ```python
-from votingGraphPortfolio import VotingGraphs
+from electionResultGraphs import ElectionResultGraphs
 
-votingGraphs = VotingGraphs(
+# example for instantiating the class
+electionResultGraphs = ElectionResultGraphs(
     "data/exampleData.csv",
     "YEAR",
     "VOTINGS",
@@ -142,7 +143,8 @@ votingGraphs.fontsize["titleMain"] = 58
 Creates a png-file of a specific chart type for the provided data
 
 ```python
-votingGraphs.getGraph(2021, type="BAR_DIFFERENCE")
+# example for creating a graph
+electionResultGraphs.getGraph(2021, type="BAR_DIFFERENCE")
 ```
 ## mandatory parameters/attributes
 `year` = *(int)* year of data
@@ -164,7 +166,8 @@ Many of the optional parameters/attributes of the main class **VotingGraphs** wi
 Creates a png-file with all four chart types arranged
 
 ```python
-votingGraphs.createOnePager()
+# example for creating a one pager
+electionResultGraphs.createOnePager()
 ```
 ## optional parameters/attributes
 `year` = *(int)* year of data, if left empty all possible years will be processed and for each year a file will be created
