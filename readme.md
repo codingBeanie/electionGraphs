@@ -29,7 +29,7 @@ As input a `csv-file` needs to be provided. In the initialization the data will 
 ###  One Pager with multiple different graphs
 ![Example One Pager](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/ElectionResults_2021.png "Example One Pager")
 
-###  One Pager with multiple different graphs
+### Single chart of bar graph
 ![Example Bar Resulr](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barResult.png "Example Bar Result")
 
 ## VotingGraphs
