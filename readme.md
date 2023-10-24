@@ -25,14 +25,14 @@ As input a `csv-file` needs to be provided. In the initialization the data will 
 ## Disclaimer
 *This tool is loosly based on german elections. Some rulesets may differ from the reality (e.g. not considering first vote, second vote). This is just a hobby project for practicing data processing and data visualization.*
 
-## Example Graph
-###  One Pager with multiple different graphs
+# Example Graph
+##  One Pager with multiple different graphs
 ![Example One Pager](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/ElectionResults_2021.png "Example One Pager")
 
-### Single chart of bar graph
+## Single chart of bar graph
 ![Example Bar Resulr](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barResult.png "Example Bar Result")
 
-## VotingGraphs
+# VotingGraphs
 
 For the initialization the mandatory parameters must be given.
 
@@ -57,7 +57,7 @@ votingGraphs.colors["background"] = "#000000"
 votingGraphs.fontsize["titleMain"] = 58
 ```
 
-## mandatory parameters
+## mandatory parameters/attributes
 
 `csvFile` = *(str)* csv file to read in -- [For example of the structure of csv see example file](data/exampleData.csv)
 
@@ -71,7 +71,7 @@ votingGraphs.fontsize["titleMain"] = 58
 
 `columnColor` = *(str)* name of column in csv in which the color code of the party is recorded
 
-## optional parameters
+## optional parameters/attributes
 
 `colors` = *(dict{str:str})* hex-color for different elements of the graphs. The value must be a *str* of hex-color (e.g. `"#F2EAD3"`) with following keys: 
    `background`
@@ -136,7 +136,35 @@ votingGraphs.fontsize["titleMain"] = 58
 `width` = *(int, default = 1200)* width of a single graph, the onePager will be around two times larger
 
 
-## Dependencies
+# function: getGraph
+Creates a png-file of a specific chart type for the provided data
+
+```python
+votingGraphs.getGraph(2021, type="BAR_DIFFERENCE")
+```
+## mandatory parameters/attributes
+`year` = *(int)* year of data
+`type` = *(str, specific options)* type of graph: 
+   `BAR_RESULT` = bar graph with basic results
+   `BAR_COMPARE` = bar graph with comparison to last voting year
+   `PIE_PARLIAMENT` = pie chart for seat distribution in a parliament
+   `BAR_COALITIONS` = stacked bar chart with possible coalitions
+
+## optional parameters/attributes
+Many of the optional parameters/attributes of the main class **VotingGraphs** will be applied to the charts (e.g. titles, colors, fonts, etc.)
+
+## function: createOnePager
+Creates a png-file with all four chart types arranged
+
+```python
+votingGraphs.createOnePager()
+```
+## optional parameters/attributes
+`year` = *(int)* year of data, if left empty all possible years will be processed and for each year a file will be created
+
+Many of the optional parameters/attributes of the main class **VotingGraphs** will be applied to the charts (e.g. titles, colors, fonts, etc.)
+
+# Dependencies
 * pandas
 * plotly
 * kaleido

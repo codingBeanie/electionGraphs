@@ -90,6 +90,7 @@ class VotingGraphs:
         ###########################################################
         # Filenames
         ##########################################################
+        self.outputfolder = "output"
         self.filenameBarResult = "barResult.png"
         self.filenameBarCompare = "barDifference.png"
         self.filenamePieParliament = "pieParliament.png"
@@ -297,7 +298,7 @@ class VotingGraphs:
     ##### getGraph ##############################################################################################################
     ##############################################################################################################################
 
-    def getGraph(self, year, type, outputfile, title="VOTING", subtitle=""):
+    def getGraph(self, year, type):
         # set up a dedicated dataframe for the graph
         printData = self.dataFrame[self.dataFrame[self.columnYear] == year].sort_values(
             by=["VOTINGS_RELATIVE"], ascending=False
@@ -344,8 +345,8 @@ class VotingGraphs:
 
             # configure layout and other visuals
             barResult.update_layout(
-                title=dict(text="<b>" + title + "</b>", font=dict(family=self.fontfamily,
-                                                                  size=self.fontsize["title"], color=self.colors["title"]), x=0.04, y=0.97,),
+                title=dict(text="<b>" + self.titleBarResult + "</b>", font=dict(family=self.fontfamily,
+                                                                                size=self.fontsize["title"], color=self.colors["title"]), x=0.04, y=0.97,),
                 paper_bgcolor=self.colors["background"],
                 plot_bgcolor=self.colors["diagram"],
                 showlegend=False,
@@ -357,7 +358,7 @@ class VotingGraphs:
                         y=1.09,
                         xref="paper",
                         yref="paper",
-                        text="<i>" + subtitle + "</i>",
+                        text="<i>" + self.subtitleBarResult + "</i>",
                         showarrow=False,
                         font=dict(
                             family=self.fontfamily,
@@ -394,13 +395,13 @@ class VotingGraphs:
 
             # export as png
             image_bytes = to_image(barResult, format="png")
-            with open(outputfile, "wb") as f:
+            with open(os.path.join(self.outputfolder, self.filenameBarResult), "wb") as f:
                 f.write(image_bytes)
 
         ############################################################################################
         # BAR_DIFFERENCE
         ############################################################################################
-        if type == "BAR_DIFFERENCE":
+        if type == "BAR_COMPARE":
             # Creating the main bar graph
             barDifference = plotly.bar(
                 printData,
@@ -415,8 +416,8 @@ class VotingGraphs:
 
             # configure layout and other visuals
             barDifference.update_layout(
-                title=dict(text="<b>" + title + "</b>", font=dict(family=self.fontfamily,
-                                                                  size=self.fontsize["title"], color=self.colors["title"]), x=0.05, y=0.97,),
+                title=dict(text="<b>" + self.titleBarCompare + "</b>", font=dict(family=self.fontfamily,
+                                                                                 size=self.fontsize["title"], color=self.colors["title"]), x=0.05, y=0.97,),
                 showlegend=False,
                 paper_bgcolor=self.colors["background"],
                 plot_bgcolor=self.colors["diagram"],
@@ -434,7 +435,7 @@ class VotingGraphs:
                         y=1.09,
                         xref="paper",
                         yref="paper",
-                        text="<i>" + subtitle + "</i>",
+                        text="<i>" + self.subtitleBarCompare + "</i>",
                         showarrow=False,
                         font=dict(family=self.fontfamily,
                                   size=self.fontsize["subtitle"],
@@ -463,13 +464,13 @@ class VotingGraphs:
             # export as png
             image_bytes = to_image(
                 barDifference, format="png")
-            with open(outputfile, "wb") as f:
+            with open(os.path.join(self.outputfolder, self.filenameBarCompare), "wb") as f:
                 f.write(image_bytes)
 
         ############################################################################################
         # PARLIAMENT GRAPH
         ############################################################################################
-        if type == "PARLIAMENT":
+        if type == "PIE_PARLIAMENT":
             # filter by parties that are above the percentage limit and exclude parties
             printDataParliament = printData.loc[printData["SEATS"] > 0]
 
@@ -494,7 +495,7 @@ class VotingGraphs:
                         labels=printDataParliament[self.columnParty],
                         values=printDataParliament["SEATS"],
                         title=dict(
-                            text="<i>" + subtitle + "</i>",
+                            text="<i>" + self.subtitlePieParliament + "</i>",
                             font=dict(family=self.fontfamily,
                                       size=self.fontsize["subtitle"],
                                       color=self.colors["subtitle"],
@@ -530,7 +531,7 @@ class VotingGraphs:
                         y=0.91,
                         xref="paper",
                         yref="paper",
-                        text="<b>" + title + "</b>",
+                        text="<b>" + self.titlePieParliament + "</b>",
                         showarrow=False,
                         font=dict(family=self.fontfamily,
                                   size=self.fontsize["title"], color=self.colors["title"]
@@ -542,18 +543,18 @@ class VotingGraphs:
             image_bytes = to_image(
                 graphParliament, format="png"
             )
-            with open(outputfile, "wb") as f:
+            with open(os.path.join(self.outputfolder, self.filenamePieParliament), "wb") as f:
                 f.write(image_bytes)
                 # get image width
-            with Image.open(outputfile) as img:
+            with Image.open(os.path.join(self.outputfolder, self.filenamePieParliament)) as img:
                 # crop image
                 img.crop((0, self.height * 0.18, self.width, self.height * 1.18)
-                         ).save(outputfile)
+                         ).save(os.path.join(self.outputfolder, self.filenamePieParliament))
 
-        ##############################################################################################################################
-        #### coalitionsGraph #########################################################################################################
-        ##############################################################################################################################
-        if type == "COALITIONS":
+        ############################################################################################################################
+        #### coalitionsGraph 
+        #############################################################################################################################
+        if type == "BAR_COALITIONS":
             printDataCoalitions = pd.DataFrame(
                 columns=["COALITION", "PARTY", "SEATS"])
             coalitions = self.getCoalitions(year)
@@ -602,7 +603,7 @@ class VotingGraphs:
                 textposition="inside", insidetextanchor='middle', textfont_size=self.fontsize["values"], textfont=dict(family=self.fontfamily))
             coalitionsGraph.update_layout(
                 title=dict(
-                    text="<b>" + title + "</b>",
+                    text="<b>" + self.titleBarCoalitions + "</b>",
                     font=dict(family=self.fontfamily,
                               size=self.fontsize["title"], color=self.colors["title"]),
                     x=0.02,
@@ -614,7 +615,7 @@ class VotingGraphs:
                         y=1.08,
                         xref="paper",
                         yref="paper",
-                        text="<i>" + subtitle + "</i>",
+                        text="<i>" + self.subtitleBarCoalitions + "</i>",
                         showarrow=False,
                         font=dict(family=self.fontfamily,
                                   size=self.fontsize["subtitle"],
@@ -643,7 +644,7 @@ class VotingGraphs:
             # export as png
             image_bytes = to_image(
                 coalitionsGraph, format="png")
-            with open(outputfile, "wb") as f:
+            with open(os.path.join(self.outputfolder, self.filenameBarCoalitions), "wb") as f:
                 f.write(image_bytes)
 
 
@@ -652,7 +653,7 @@ class VotingGraphs:
 ##############################################################################################################################
 
 
-    def createOnePager(self, year=None, outputfolder="output"):
+    def createOnePager(self, year=None):
 
         if year == None:
             for y in self.yearsInDataFrame:
@@ -660,20 +661,10 @@ class VotingGraphs:
             exit()
 
         # create graphs
-        self.getGraph(year, "BAR_RESULT",
-                      outputfile=os.path.join(outputfolder, self.filenameBarResult), title=self.titleBarResult, subtitle=self.subtitleBarResult)
-        self.getGraph(year, "BAR_DIFFERENCE",
-                      outputfile=os.path.join(outputfolder, self.filenameBarCompare), title=self.titleBarCompare, subtitle=self.subtitleBarCompare)
-        self.getGraph(year, "PARLIAMENT",
-                      outputfile=os.path.join(outputfolder, self.filenamePieParliament), title=self.titlePieParliament, subtitle=self.subtitlePieParliament)
-        self.getGraph(
-            year,
-            "COALITIONS",
-            outputfile=os.path.join(outputfolder, self.filenameBarCoalitions),
-            title=self.titleBarCoalitions,
-            subtitle=self.subtitleBarCoalitions,
-        )
-
+        self.getGraph(year, "BAR_RESULT")
+        self.getGraph(year, "BAR_COMPARE")
+        self.getGraph(year, "PIE_PARLIAMENT")
+        self.getGraph(year, "BAR_COALITIONS")
         # open images
         imgBarResult = Image.open("output/barResult.png")
         imgBarCompare = Image.open("output/barDifference.png")
@@ -711,16 +702,16 @@ class VotingGraphs:
         # add title
         self.filenameOutput = self.filenameOnePager + \
             "_" + str(year) + ".png"
-        onePager.save(os.path.join(outputfolder, self.filenameOutput),
+        onePager.save(os.path.join(self.outputfolder, self.filenameOutput),
                       "PNG")
         finalPager = Image.open(os.path.join(
-            outputfolder, self.filenameOutput))
+            self.outputfolder, self.filenameOutput))
         draw = ImageDraw.Draw(finalPager)
         font = ImageFont.truetype("fonts/Futura.ttc", 140)
         draw.text((spaceGraphMargins[0], spaceGraphMargins[1]), self.titleMain + " " + str(year), font=font, fill=self.colors["title"],
                   )
 
-        finalPager.save(os.path.join(outputfolder, self.filenameOutput),
+        finalPager.save(os.path.join(self.outputfolder, self.filenameOutput),
                         "PNG")
 
 

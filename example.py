@@ -8,8 +8,7 @@ votingGraphs = VotingGraphs(
     "PARTY_SPEC",
     "PARTY_COLOR",
 )
-# votingGraphs.getGraph(2021, "BAR_RESULT", "output/barResult.png",
-#                      title="Wahlergebnis 2021 TEST", subtitle="Anteil der Wählerstimmen in Prozent")
+votingGraphs.getGraph(2021, type="BAR_DIFFERENCE")
 # votingData.getGraph(2021, "BAR_DIFFERENCE", "output/barDifference.png",
 #                    title="Wahlergebnis 2021", subtitle="Prozentpunkte im Vergleich zur letzten Wahl")
 # votingData.getGraph(2021, "PARLIAMENT", "output/pieParliament.png",
