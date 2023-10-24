@@ -65,6 +65,16 @@ votingGraphs.fontsize["titleMain"] = 58
 
 `excludeParties` = *(list[str], default = ["Sonstiges", "Sonstige", "Other"])* list of party names which will not be included in the seat allocation
 
+`filenameBarCompare` = *(str, default =  "barDifference.png")* filename of export graph. Must be a .png file
+
+`filenameBarResult` = *(str, default =  "barResult.png")* filename of export graph. Must be a .png file
+
+`filenameBarCoalitions` = *(str, default =  "barCoalition.png")* filename of export graph. Must be a .png file
+
+`filenameOnePager` = *(str, default =  "ElectionResults")* filename of export graph. Must be a .png file
+
+`filenamePieParliament` = *(str, default =  "pieParliament.png")* filename of export graph. Must be a .png file
+
 `fontfamily` = *(str, default = "Futura")* font family of all graphs
 
 `fontsize` = *(dict{str:int})* font sizes of different elements. Each key represent a text type with following options: 
@@ -74,13 +84,31 @@ votingGraphs.fontsize["titleMain"] = 58
    `yaxis`
    `xaxis`
 
+`height` = *(int, default = 800)* height of a single graph, the onePager will be around two times larger
+
 `parliamentSeats` = *(int, default = 120)* number of seats in parliament
 
 `percentageLimit` = *(int, default = 5)* threshold at which a party will not be considered when calculting seat distribution
 
-`height` = *(int, default = 800)* height of a single graph, the onePager will be around two times larger
+`titleBarCoalitions` = *(str, default="Koalitionen")* adjusts title of bar graph with possible coalitions
+
+`titleBarCompare` = *(str, default="Veränderung der Wählerstimmen")* adjusts title of bar graph with comparision to last voting
+
+`titleBarResult` = *(str, default="Wählerstimmen")* adjusts title of bar graph with results
+
+`titleMain` = *(str, default="Wahlergebnisse")* adjusts main title of one pager
+
+`titlePieParliament` = *(str, default="Sitzverteilung")* adjusts  title of parliament graph
 
 `seperator` = *(str, default = ";")* type of seperator in csv
+
+`subtitleBarCoalitions`= *(str, default="Anzahl Sitze für mögliche Koalitionen")* adjusts a subtitle of corresponding graph
+
+`subtitleBarCompare` = *(str, default="Prozentpunkte im Vergleich zur letzten Wahl")* adjusts a subtitle of corresponding graph
+
+`subtitleBarResult` = *(str, default="Anteil der Wählerstimmen in Prozent")* adjusts a subtitle of corresponding graph
+
+`subtitlePieParliament` = *(str, default="Anzahl Sitze im Parlament")* adjusts a subtitle of corresponding graph
 
 `width` = *(int, default = 1200)* width of a single graph, the onePager will be around two times larger
 
