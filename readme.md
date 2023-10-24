@@ -1,12 +1,26 @@
 # Voting Graph Portfolio
-**The Voting Graph Portfolio** is a python class that allows to create different voting charts/graphs. This class takes a pandas dataframe as input and processes the data in order to display the graphs accordingly.
-This tool is loosly based on german elections. Some rulesets may differ from the reality. This is just a hobby project for practicing data processing and data visualization.
+**The Voting Graph Portfolio** creates four different graphs for displaying the result of an election. The graphs can either be created seperately or combined into one chart.
+As input a ´pandas´ ´dataFrame´ needs to be provided. In the initialization the provided ´dataFrame´ will be processed. Relative votings, as well as a seat distribution for a parliament will be calculated and later be displayed.
+This tool is loosly based on german elections. Some rulesets may differ from the reality (e.g. not considering first vote, second vote). This is just a hobby project for practicing data processing and data visualization.
+
+## Quickstart
+
+## Example Code
 
 ## Example Graph
 ###  One Pager with multiple different graphs
 ![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/ElectionResults_2021.png "Example Chart")
 
+## VotingGraphs
+### mandatory 
+* ´csvFile´ = (str) csv file to read in
+* ´columnYear´ = (str) name of column in csv in which the year is recorded
 
+### optional
+
+### Parameters 
+
+# Project Management
 ## Goals
 * :white_check_mark: done / implemented 
 * :large_orange_diamond: in developement / not ready
@@ -34,7 +48,7 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 
 ### Finish Touch
 * :large_orange_diamond: review code and optimize
-* :red_circle: create documentation
+* :large_orange_diamond:create documentation
 * :red_circle: create and publish as package
 
 ### Bugs

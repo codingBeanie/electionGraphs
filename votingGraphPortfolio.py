@@ -11,7 +11,7 @@ from plotly.io import to_image
 from PIL import Image, ImageDraw, ImageFont
 
 
-class VotingData:
+class VotingGraphs:
     def __init__(
         self,
         csvFile,
@@ -21,24 +21,22 @@ class VotingData:
         columnSpectrum,
         columnColor,
         parliamentSeats,
-        seperator=";",
-        percentageLimit=5,
+
+
         excludeParties=["Sonstiges", "Sonstige",
-                        "Sonstige Parteien", "Sonstige Partei"],
+                        "Sonstige Parteien", "Sonstige Partei", "other", "others", "Others", "Others parties", "Others party", "Others Parties", "Others Party"],
     ):
-        # read the csv and create the base dataFrame
-        self.dataFrame = pd.read_csv(csvFile, sep=seperator)
 
         ###########################################################
         # Input Variables
         ###########################################################
-
+        self.seperator = ";",
         self.parliamentSeats = parliamentSeats
         self.columnYear = columnYear
         self.columnParty = columnParty
         self.columnSpectrum = columnSpectrum
         self.columnColor = columnColor
-        self.percentageLimit = percentageLimit
+        self.percentageLimit = 5
         self.width = 1200
         self.height = 800
         self.excludeParties = excludeParties
@@ -95,6 +93,8 @@ class VotingData:
         ###########################################################
         # data processing
         ###########################################################
+        # read the csv and create the base dataFrame
+        self.dataFrame = pd.read_csv(csvFile, sep=self.seperator)
 
         # calculate the total and relative votes for each year in dataFrame
         for year in self.yearsInDataFrame:
@@ -718,24 +718,3 @@ class VotingData:
 ##############################################################################################################################
 ##############################################################################################################################
 ##############################################################################################################################
-
-
-votingData = VotingData(
-    "data/exampleData.csv",
-    "YEAR",
-    "VOTINGS",
-    "PARTY_SHORT",
-    "PARTY_SPEC",
-    "PARTY_COLOR",
-    120,
-)
-votingData.getGraph(2021, "BAR_RESULT", "output/barResult.png",
-                    title="Wahlergebnis 2021 TEST", subtitle="Anteil der Wählerstimmen in Prozent")
-# votingData.getGraph(2021, "BAR_DIFFERENCE", "output/barDifference.png",
-#                    title="Wahlergebnis 2021", subtitle="Prozentpunkte im Vergleich zur letzten Wahl")
-# votingData.getGraph(2021, "PARLIAMENT", "output/pieParliament.png",
-#                    title="Wahlergebnis 2021", subtitle="Anzahl Sitze im Parlament")
-# votingData.getGraph(2021, "COALITIONS", "output/barCoalition.png",
-#                    title="Wahlergebnis 2021", subtitle="Anzahl Sitze für mögliche Koalitionen")
-
-votingData.createOnePager()
