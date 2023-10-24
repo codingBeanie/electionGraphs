@@ -113,7 +113,7 @@ class VotingGraphs:
             # sum of all votes that are above 5% and not in excludeParties
             totalVotesAboveLimit = self.dataFrame.loc[
                 (self.dataFrame[self.columnYear] == year)
-                & (self.dataFrame["VOTINGS_RELATIVE"] >= self.percentageLimit) & (self.dataFrame[self.columnParty].isin(excludeParties) == False),
+                & (self.dataFrame["VOTINGS_RELATIVE"] >= self.percentageLimit) & (self.dataFrame[self.columnParty].isin(self.excludeParties) == False),
                 columnVotings,
             ].sum()
 
@@ -121,17 +121,17 @@ class VotingGraphs:
             # get the modulus of the seat calculation to later correct for rounding errors
             self.dataFrame.loc[
                 (self.dataFrame[self.columnYear] == year)
-                & (self.dataFrame["VOTINGS_RELATIVE"] >= self.percentageLimit) & (self.dataFrame[self.columnParty].isin(excludeParties) == False),
+                & (self.dataFrame["VOTINGS_RELATIVE"] >= self.percentageLimit) & (self.dataFrame[self.columnParty].isin(self.excludeParties) == False),
                 ["ROUNDED_SEATS"]
-            ] = np.mod(parliamentSeats * self.dataFrame[columnVotings], totalVotesAboveLimit)
+            ] = np.mod(self.parliamentSeats * self.dataFrame[columnVotings], totalVotesAboveLimit)
 
             # calculate the number of seats for each party which is above the percentage limit
             # rounded down / floored values
             self.dataFrame.loc[
                 (self.dataFrame[self.columnYear] == year)
-                & (self.dataFrame["VOTINGS_RELATIVE"] >= self.percentageLimit) & (self.dataFrame[self.columnParty].isin(excludeParties) == False),
+                & (self.dataFrame["VOTINGS_RELATIVE"] >= self.percentageLimit) & (self.dataFrame[self.columnParty].isin(self.excludeParties) == False),
                 ["SEATS"]
-            ] = np.floor(parliamentSeats * self.dataFrame[columnVotings] / totalVotesAboveLimit)
+            ] = np.floor(self.parliamentSeats * self.dataFrame[columnVotings] / totalVotesAboveLimit)
             self.dataFrame["SEATS"] = self.dataFrame["SEATS"].fillna(0)
             self.dataFrame["SEATS"] = self.dataFrame["SEATS"].astype(int)
 

@@ -13,6 +13,7 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 
 ## VotingGraphs
 
+For the initialization the mandatory parameters must be given.
 
 ```python
 from votingGraphPortfolio import VotingGraphs
@@ -27,8 +28,16 @@ votingGraphs = VotingGraphs(
 )
 ```
 
+After initialization different aspects of logic and styling can be configured by setting the optional parameters:
 
-### mandatory 
+```python
+votingGraphs.titleMain = "My other Title"
+votingGraphs.colors["background"] = "#000000"
+votingGraphs.fontsize["titleMain"] = 58
+```
+
+### mandatory parameters
+
 `csvFile` = *(str)* csv file to read in -- [For example of the structure of csv see example file](data/exampleData.csv)
 
 `columnYear` = *(str)* name of column in csv in which the year is recorded
@@ -41,9 +50,18 @@ votingGraphs = VotingGraphs(
 
 `columnColor` = *(str)* name of column in csv in which the color code of the party is recorded
 
-### optional
+### optional parameters
 
-`colors` = *(dict)* hex-color for different elements of the graphs with following keys: `background`, `diagram`, `title`, `subtitle`, `yaxis`, `xaxis`, `grid`, `values`, `threshold`. The value must be a *str* of hex-color (e.g. `"#F2EAD3"`)
+`colors` = *(dict)* hex-color for different elements of the graphs. The value must be a *str* of hex-color (e.g. `"#F2EAD3"`) with following keys: 
+   `background`
+   `diagram`
+   `title`
+   `subtitle` 
+   `yaxis` 
+   `xaxis` 
+   `grid` 
+   `values` 
+   `threshold` 
 
 `excludeParties` = *(list, default = ["Sonstiges", "Sonstige", "Other"])* list of party names which will not be included in the seat allocation
 

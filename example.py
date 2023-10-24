@@ -17,5 +17,5 @@ votingGraphs = VotingGraphs(
 # votingData.getGraph(2021, "COALITIONS", "output/barCoalition.png",
 #                    title="Wahlergebnis 2021", subtitle="Anzahl Sitze für mögliche Koalitionen")
 
-votingGraphs.titleMain = "Wahlergebnis TEST"
+
 votingGraphs.createOnePager()
