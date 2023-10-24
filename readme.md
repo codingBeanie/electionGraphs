@@ -12,7 +12,7 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 ![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/ElectionResults_2021.png "Example Chart")
 
 ## VotingGraphs
-[For example of the structure of csv see example file](data/exampleData.csv)
+
 
 ```python
 from votingGraphPortfolio import VotingGraphs
@@ -29,7 +29,7 @@ votingGraphs = VotingGraphs(
 
 
 ### mandatory 
-`csvFile` = *(str)* csv file to read in
+`csvFile` = *(str)* csv file to read in -- [For example of the structure of csv see example file](data/exampleData.csv)
 
 `columnYear` = *(str)* name of column in csv in which the year is recorded
 
