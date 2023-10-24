@@ -30,17 +30,18 @@ class VotingGraphs:
         ###########################################################
         # Input Variables
         ###########################################################
-        self.seperator = ";"
-        self.parliamentSeats = 120
         self.columnYear = columnYear
         self.columnParty = columnParty
         self.columnSpectrum = columnSpectrum
         self.columnColor = columnColor
+        self.columnVotings = columnVotings
+
+        self.seperator = ";"
+        self.parliamentSeats = 120
         self.percentageLimit = 5
         self.width = 1200
         self.height = 800
-        self.excludeParties = ["Sonstiges", "Sonstige",
-                               "Sonstige Parteien", "Sonstige Partei", "other", "others", "Others", "Others parties", "Others party", "Others Parties", "Others Party"]
+        self.excludeParties = ["Sonstiges", "Sonstige", "Other"]
 
         ###########################################################
         # Styling Variable

@@ -43,6 +43,23 @@ votingGraphs = VotingGraphs(
 
 ### optional
 
+`colors` = *(dict)* hex-color for different elements of the graphs with following keys: `background`, `diagram`, `title`, `subtitle`, `yaxis`, `xaxis`, `grid`, `values`, `threshold`. The value must be a *str* of hex-color (e.g. `"#F2EAD3"`)
+
+`excludeParties` = *(list, default = ["Sonstiges", "Sonstige", "Other"])* list of party names which will not be included in the seat allocation
+
+`parliamentSeats` = *(int, default = 120)* number of seats in parliament
+
+`percentageLimit` = *(int, default = 5)* threshold at which a party will not be considered when calculting seat distribution
+
+`height` = *(int, default = 800)* height of a single graph, the onePager will be around two times larger
+
+`seperator` = *(str, default = ";")* type of seperator in csv
+
+`width` = *(int, default = 1200)* width of a single graph, the onePager will be around two times larger
+
+
+
+
 
 # Project Management
 ## Goals
