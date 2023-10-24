@@ -12,10 +12,32 @@ This tool is loosly based on german elections. Some rulesets may differ from the
 ![Example Chart](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/ElectionResults_2021.png "Example Chart")
 
 ## VotingGraphs
+´´´´python
+from votingGraphPortfolio import VotingGraphs
+
+votingGraphs = VotingGraphs(
+    "data/exampleData.csv",
+    "YEAR",
+    "VOTINGS",
+    "PARTY_SHORT",
+    "PARTY_SPEC",
+    "PARTY_COLOR",
+)
+´´´
+
+
 ### mandatory 
 `csvFile` = *(str)* csv file to read in
 
 `columnYear` = *(str)* name of column in csv in which the year is recorded
+
+`columnVotings` = *(str)* name of column in csv in which the absolute number of votings per party is recorded
+
+`columnParty` = *(str)* name of column in csv in which party name is recorded 
+
+`columnSpectrum` = *(str)* name of column in csv in which the political orientation of the party is recorded
+
+`columnColor` = *(str)* name of column in csv in which the color code of the party is recorded
 
 ### optional
 

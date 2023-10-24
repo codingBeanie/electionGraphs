@@ -1,37 +1,37 @@
-###########################################################
-# Class for processing voting data
-###########################################################
-import pandas as pd
 import os
 import numpy as np
 from itertools import combinations
+
+import pandas as pd
+
 import plotly.express as plotly
 import plotly.graph_objects as go
 from plotly.io import to_image
+
 from PIL import Image, ImageDraw, ImageFont
+
+##############################################################################################################################
+##############################################################################################################################
+##############################################################################################################################
 
 
 class VotingGraphs:
     def __init__(
         self,
+        # mandatory input variables
         csvFile,
         columnYear,
         columnVotings,
         columnParty,
         columnSpectrum,
         columnColor,
-        parliamentSeats,
-
-
-        excludeParties=["Sonstiges", "Sonstige",
-                        "Sonstige Parteien", "Sonstige Partei", "other", "others", "Others", "Others parties", "Others party", "Others Parties", "Others Party"],
     ):
 
         ###########################################################
         # Input Variables
         ###########################################################
-        self.seperator = ";",
-        self.parliamentSeats = parliamentSeats
+        self.seperator = ";"
+        self.parliamentSeats = 120
         self.columnYear = columnYear
         self.columnParty = columnParty
         self.columnSpectrum = columnSpectrum
@@ -39,9 +39,8 @@ class VotingGraphs:
         self.percentageLimit = 5
         self.width = 1200
         self.height = 800
-        self.excludeParties = excludeParties
-        self.yearsInDataFrame = sorted(
-            self.dataFrame[self.columnYear].unique())
+        self.excludeParties = ["Sonstiges", "Sonstige",
+                               "Sonstige Parteien", "Sonstige Partei", "other", "others", "Others", "Others parties", "Others party", "Others Parties", "Others Party"]
 
         ###########################################################
         # Styling Variable
@@ -95,6 +94,8 @@ class VotingGraphs:
         ###########################################################
         # read the csv and create the base dataFrame
         self.dataFrame = pd.read_csv(csvFile, sep=self.seperator)
+        self.yearsInDataFrame = sorted(
+            self.dataFrame[self.columnYear].unique())
 
         # calculate the total and relative votes for each year in dataFrame
         for year in self.yearsInDataFrame:
@@ -642,6 +643,7 @@ class VotingGraphs:
 ##############################################################################################################################
 #### createOnePager #########################################################################################################
 ##############################################################################################################################
+
 
     def createOnePager(self, year=None, outputfolder="output"):
 
