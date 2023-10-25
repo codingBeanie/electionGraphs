@@ -2,6 +2,10 @@
 With **ElectionResultGraphs** you can create either four different graph types or all graphs as one chart for displaying the result of a election based on a csv-inputfile.
 As input a `csv-file` needs to be provided. In the initialization the data will be processed as `pandas` `dataframe` and graphs from `plotly` can be exported as image-files.
 
+```
+pip install electionGraphs
+```
+
 ## Features
 * data from the csv-file will be processed and more data points will be calculated (initialization)
 * a `.getGraph()` function can create different types of graphs
