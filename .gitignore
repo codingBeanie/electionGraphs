@@ -1,4 +1,5 @@
 venv/
+build/
 dist
 setup.py
 electionGraphs.egg-info/

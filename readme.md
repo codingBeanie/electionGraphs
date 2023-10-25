@@ -31,10 +31,10 @@ pip install electionGraphs
 
 # Example Graph
 ##  One Pager with multiple different graphs
-![Example One Pager](/electionGraphs/output/ElectionResults_2021.png "Example One Pager")
+![Example One Pager](https://github.com/ricochan/electionGraphs/blob/main/electionGraphs/output/ElectionResults_2017.png "Example One Pager")
 
 ## Single chart of bar graph
-![Example Bar Resulr](/electionGraphs/output/barResult.png "Example Bar Result")
+![Example Bar Result](https://github.com/ricochan/electionGraphs/blob/main/electionGraphs/output/barResult.png "Example Bar Result")
 
 # VotingGraphs
 
