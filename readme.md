@@ -1,5 +1,5 @@
 # Election Result Graphs
-**ElectionResultGraphs** creates four different graphs for displaying the result of an election. The graphs can either be created seperately or combined into one chart.
+With **ElectionResultGraphs** you can create either four different graph types or all graphs as one chart for displaying the result of a election based on a csv-inputfile.
 As input a `csv-file` needs to be provided. In the initialization the data will be processed as `pandas` `dataframe` and graphs from `plotly` can be exported as image-files.
 
 ## Features
