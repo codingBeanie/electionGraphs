@@ -30,7 +30,7 @@ As input a `csv-file` needs to be provided. In the initialization the data will 
 ![Example One Pager](/electionGraphs/output/ElectionResults_2021.png "Example One Pager")
 
 ## Single chart of bar graph
-![Example Bar Resulr](https://github.com/ricochan/VotingGraphPortfolio/blob/main/electionGraphs/output/barResult.png "Example Bar Result")
+![Example Bar Resulr](/electionGraphs/output/barResult.png "Example Bar Result")
 
 # VotingGraphs
 
