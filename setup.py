@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = '1.0'
+VERSION = '0.1.0'
 DESCRIPTION = 'Create graphs for displaying the result of a election based on a csv-inputfile.'
 LONG_DESCRIPTION = 'With ElectionResultGraphs you can create either four different graph types or all graphs as one chart for displaying the result of a election based on a csv-inputfile.'
 
@@ -17,9 +17,9 @@ setup(
     install_requires=['pandas', 'plotly', 'kaleido', 'pillow'],
     keywords=['python', 'elections', 'voting', 'graphs', 'charts'],
     classifiers=[
-        "Development Status :: Finished",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
-        "License :: MIT License",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ]
 )

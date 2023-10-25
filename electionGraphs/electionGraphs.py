@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 ##############################################################################################################################
 
 
-class ElectionResultGraphs:
+class ElectionGraphs:
     def __init__(
         self,
         # mandatory input variables

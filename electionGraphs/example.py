@@ -1,7 +1,7 @@
-from electionResultGraphs import ElectionResultGraphs
+from electionGraphs import ElectionGraphs
 
 # example for instantiating the class
-electionResultGraphs = ElectionResultGraphs(
+electionGraphs = ElectionGraphs(
     "data/exampleData.csv",
     "YEAR",
     "VOTINGS",
@@ -11,7 +11,7 @@ electionResultGraphs = ElectionResultGraphs(
 )
 
 # example for creating a graph
-electionResultGraphs.getGraph(2021, type="BAR_DIFFERENCE")
+electionGraphs.getGraph(2021, type="BAR_DIFFERENCE")
 
 # example for creating a one pager
-electionResultGraphs.createOnePager()
+electionGraphs.createOnePager()

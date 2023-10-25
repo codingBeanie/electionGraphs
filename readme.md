@@ -27,20 +27,20 @@ As input a `csv-file` needs to be provided. In the initialization the data will 
 
 # Example Graph
 ##  One Pager with multiple different graphs
-![Example One Pager](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/ElectionResults_2021.png "Example One Pager")
+![Example One Pager](https://github.com/ricochan/VotingGraphPortfolio/blob/main/electionGraphs/output/ElectionResults_2021.png "Example One Pager")
 
 ## Single chart of bar graph
-![Example Bar Resulr](https://github.com/ricochan/VotingGraphPortfolio/blob/main/output/barResult.png "Example Bar Result")
+![Example Bar Resulr](https://github.com/ricochan/VotingGraphPortfolio/blob/main/electionGraphs/output/barResult.png "Example Bar Result")
 
 # VotingGraphs
 
 For the initialization the mandatory parameters must be given.
 
 ```python
-from electionResultGraphs import ElectionResultGraphs
+from electionGraphs import ElectionGraphs
 
 # example for instantiating the class
-electionResultGraphs = ElectionResultGraphs(
+electionGraphs = ElectionGraphs(
     "data/exampleData.csv",
     "YEAR",
     "VOTINGS",
@@ -144,7 +144,7 @@ Creates a png-file of a specific chart type for the provided data
 
 ```python
 # example for creating a graph
-electionResultGraphs.getGraph(2021, type="BAR_DIFFERENCE")
+electionGraphs.getGraph(2021, type="BAR_DIFFERENCE")
 ```
 ## mandatory parameters/attributes
 `year` = *(int)* year of data
@@ -167,7 +167,7 @@ Creates a png-file with all four chart types arranged
 
 ```python
 # example for creating a one pager
-electionResultGraphs.createOnePager()
+electionGraphs.createOnePager()
 ```
 ## optional parameters/attributes
 `year` = *(int)* year of data, if left empty all possible years will be processed and for each year a file will be created
