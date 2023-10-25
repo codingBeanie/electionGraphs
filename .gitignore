@@ -1,5 +1,7 @@
 venv/
 build/
 dist
+pyproject.toml
+tests/
 setup.py
 electionGraphs.egg-info/

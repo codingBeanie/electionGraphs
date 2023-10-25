@@ -41,11 +41,12 @@ pip install electionGraphs
 For the initialization the mandatory parameters must be given.
 
 ```python
-from electionGraphs import ElectionGraphs
+from electionGraphs import electionGraphs
 
 # example for instantiating the class
-electionGraphs = ElectionGraphs(
-    "data/exampleData.csv",
+
+eg = electionGraphs.ElectionGraphs(
+    "exampleData.csv",
     "YEAR",
     "VOTINGS",
     "PARTY_SHORT",
