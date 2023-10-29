@@ -25,6 +25,7 @@ class ElectionGraphs:
         columnParty,
         columnSpectrum,
         columnColor,
+        parliamentSeats=120,
     ):
 
         ###########################################################
@@ -37,7 +38,7 @@ class ElectionGraphs:
         self.columnVotings = columnVotings
 
         self.seperator = ";"
-        self.parliamentSeats = 120
+        self.parliamentSeats = parliamentSeats
         self.percentageLimit = 5
         self.width = 1200
         self.height = 800
@@ -317,14 +318,7 @@ class ElectionGraphs:
 
         # for a mostly uniform look, the yaxis range is set based on the maximum value
         maxValue = printData["VOTINGS_RELATIVE"].max()
-        if maxValue > 80:
-            self.yRange = [0, 100]
-        elif maxValue > 60:
-            self.yRange = [0, 85]
-        elif maxValue > 40:
-            self.yRange = [0, 65]
-        elif maxValue > 20:
-            self.yRange = [0, 45]
+        self.yRange = [0, maxValue + 5]
 
         ############################################################################################
         # BAR_RESULT

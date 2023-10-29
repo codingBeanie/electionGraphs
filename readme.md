@@ -111,11 +111,9 @@ votingGraphs.fontsize["titleMain"] = 58
    `yaxis`
    `xaxis`
 
-`height` = *(int, default = 800)* height of a single graph, the onePager will be around two times larger
-
 `outputfolder` = *(str, default = "output")* folder in which all output images will be saved
 
-`parliamentSeats` = *(int, default = 120)* number of seats in parliament
+`parliamentSeats` = *(int, default = 120)* number of seats in parliament. This parameter needs be defined at the initialization, otherwise some graphs will not display the seats correctly
 
 `percentageLimit` = *(int, default = 5)* threshold at which a party will not be considered when calculting seat distribution
 
@@ -140,8 +138,6 @@ votingGraphs.fontsize["titleMain"] = 58
 `subtitleBarResult` = *(str, default="Anteil der Wählerstimmen in Prozent")* adjusts a subtitle of corresponding graph
 
 `subtitlePieParliament` = *(str, default="Anzahl Sitze im Parlament")* adjusts a subtitle of corresponding graph
-
-`width` = *(int, default = 1200)* width of a single graph, the onePager will be around two times larger
 
 
 # function: getGraph
